@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <rect width="512" height="512" rx="96" fill="#0a0a0a"/>
+  <!-- Kettlebell shape: handle + bell -->
+  <g fill="#d4ff00">
+    <!-- Handle -->
+    <path d="M 200 130 Q 200 95 256 95 Q 312 95 312 130 L 312 170 Q 312 175 308 175 L 290 175 Q 286 175 286 170 L 286 135 Q 286 121 256 121 Q 226 121 226 135 L 226 170 Q 226 175 222 175 L 204 175 Q 200 175 200 170 Z"/>
+    <!-- Bell -->
+    <path d="M 256 175 Q 360 175 380 290 Q 395 405 256 405 Q 117 405 132 290 Q 152 175 256 175 Z"/>
+  </g>
+  <!-- Highlight on bell -->
+  <ellipse cx="220" cy="240" rx="22" ry="14" fill="#0a0a0a" opacity="0.18"/>
+</svg>
