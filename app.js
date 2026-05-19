@@ -2,14 +2,20 @@
 // STRENGTH FOUNDATION PROGRAM — APP LOGIC
 // ============================================================
 
+// HTML escape for safely rendering user-typed strings inside templates
+function esc(s) {
+  if (s == null) return '';
+  return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
 const PROGRAM_START = new Date(2026, 4, 19); // May 19, 2026 (Tue) — Wk 1 Day A
 const PROGRAM_END   = new Date(2026, 6, 11); // Jul 11, 2026 (Sat) — Wk 8 Day C
 
 // ============================================================
-// EXERCISE DATA
+// EXERCISE DATA — DEFAULT PROGRAM (seed; user can override in app)
 // reps array indexed by phase block: [Wk1-2, Wk3-4, Wk5-6, Wk7-8]
 // ============================================================
-const DAYS = {
+const DEFAULT_DAYS = {
   A: {
     title: 'Day A',
     sub: 'Lower Body + Core',
@@ -302,7 +308,34 @@ const STORAGE = {
     const log = this.getLog(week, dayKey, exId);
     return log && log.completed;
   },
+  // Session-level notes (one per workout day per week)
+  setSessionNote(week, dayKey, text) {
+    const k = `sess-note:wk${week}:${dayKey}`;
+    if (text && text.trim()) localStorage.setItem(k, text);
+    else localStorage.removeItem(k);
+  },
+  getSessionNote(week, dayKey) {
+    return localStorage.getItem(`sess-note:wk${week}:${dayKey}`) || '';
+  },
+  // Program customization (the entire DAYS object, edited by the user)
+  saveProgram(days) {
+    localStorage.setItem('program-v1', JSON.stringify(days));
+  },
+  loadProgram() {
+    const v = localStorage.getItem('program-v1');
+    return v ? JSON.parse(v) : null;
+  },
+  resetProgram() {
+    localStorage.removeItem('program-v1');
+  },
 };
+
+// Mutable program — seeded from DEFAULT_DAYS, but user edits persist to localStorage
+let DAYS = STORAGE.loadProgram() || JSON.parse(JSON.stringify(DEFAULT_DAYS));
+function saveProgramAndRerender() {
+  STORAGE.saveProgram(DAYS);
+  renderWorkout();
+}
 
 // ============================================================
 // STATE
@@ -361,15 +394,27 @@ function renderWorkout() {
   header.className = 'day-header';
   const todayBadge = isToday ? `<span style="color: var(--accent); font-size: 11px; letter-spacing: 0.18em; margin-left: 8px;">· TODAY</span>` : '';
   header.innerHTML = `
-    <div class="focus">${day.weekdayLong.toUpperCase()} · ${fmtDate(sessionDate).toUpperCase()}${todayBadge}</div>
-    <h1 class="display">${day.title}<span class="sub">${day.sub}</span></h1>
+    <div class="focus">${esc(day.weekdayLong.toUpperCase())} · ${esc(fmtDate(sessionDate).toUpperCase())}${todayBadge}</div>
+    <h1 class="display">${esc(day.title)}<span class="sub">${esc(day.sub)}</span></h1>
     <div class="session-meta">
-      ${day.duration} · ${day.equipment}
+      ${esc(day.duration)} · ${esc(day.equipment)}
       ${day.injection ? '<span class="injection-tag">💉 Injection Day</span>' : ''}
     </div>
-    ${day.notes ? `<div class="session-meta" style="margin-top: 6px; font-style: italic;">${day.notes}</div>` : ''}
+    ${day.notes ? `<div class="session-meta" style="margin-top: 6px; font-style: italic;">${esc(day.notes)}</div>` : ''}
   `;
   v.appendChild(header);
+
+  // Session-level notes (one per workout day per week)
+  const noteBlock = document.createElement('div');
+  noteBlock.className = 'session-notes-block';
+  noteBlock.innerHTML = `
+    <label class="session-notes-label">SESSION NOTES — WK ${STATE.selectedWeek} ${esc(day.title)}</label>
+    <textarea class="session-notes-input" placeholder="How did today go? Energy, mood, weather, anything off…">${esc(STORAGE.getSessionNote(STATE.selectedWeek, STATE.selectedDay))}</textarea>
+  `;
+  noteBlock.querySelector('textarea').addEventListener('input', (e) => {
+    STORAGE.setSessionNote(STATE.selectedWeek, STATE.selectedDay, e.target.value);
+  });
+  v.appendChild(noteBlock);
 
   // Completion banner if all loggable exercises done
   const loggables = day.sections.flatMap(s => s.exercises.filter(e => !e.noLog));
@@ -382,15 +427,72 @@ function renderWorkout() {
   }
 
   // Sections
-  day.sections.forEach(section => {
+  day.sections.forEach((section, sIdx) => {
     const secEl = document.createElement('section');
     secEl.className = 'section';
-    secEl.innerHTML = `<div class="section-head"><div class="title">${section.title}</div>${section.duration ? `<div class="duration">${section.duration}</div>` : ''}</div>`;
+    secEl.innerHTML = `<div class="section-head"><div class="title">${esc(section.title)}</div>${section.duration ? `<div class="duration">${esc(section.duration)}</div>` : ''}</div>`;
     section.exercises.forEach(ex => {
       secEl.appendChild(renderExercise(ex, repIdx));
     });
+    // "Add Exercise" button per section
+    const addBtn = document.createElement('button');
+    addBtn.className = 'add-ex-btn';
+    addBtn.innerHTML = '+ Add Exercise';
+    addBtn.addEventListener('click', () => openAddExerciseForm(secEl, section));
+    secEl.appendChild(addBtn);
     v.appendChild(secEl);
   });
+}
+
+// Open inline "add exercise" form within a section element
+function openAddExerciseForm(secEl, section) {
+  // Don't double-open
+  if (secEl.querySelector('.add-ex-form')) return;
+  const form = document.createElement('div');
+  form.className = 'ex add-ex-form editing';
+  form.innerHTML = `
+    <div class="ex-edit-form">
+      <div class="edit-title">Add Exercise</div>
+      <div class="edit-row"><label>NAME</label><input type="text" data-edit="name" placeholder="e.g., Banded Pull-Apart"></div>
+      <div class="edit-row"><label>EQUIPMENT</label><input type="text" data-edit="equip" placeholder="e.g., Band"></div>
+      <div class="edit-row-group">
+        <div class="edit-row-group-label">SETS × REPS BY PHASE</div>
+        <div class="edit-row tight"><label>Wk 1–2</label><input type="text" data-edit="rep0" placeholder="2×10"></div>
+        <div class="edit-row tight"><label>Wk 3–4</label><input type="text" data-edit="rep1" placeholder="3×10"></div>
+        <div class="edit-row tight"><label>Wk 5–6</label><input type="text" data-edit="rep2" placeholder="3×12"></div>
+        <div class="edit-row tight"><label>Wk 7–8</label><input type="text" data-edit="rep3" placeholder="3×15"></div>
+      </div>
+      <div class="edit-row col"><label>COACHING CUE (optional)</label><textarea data-edit="cue" rows="3" placeholder="Form notes, what to focus on…"></textarea></div>
+      <div class="edit-actions">
+        <button class="edit-btn save">Add</button>
+        <button class="edit-btn cancel">Cancel</button>
+      </div>
+    </div>
+  `;
+  // Insert before the "+ Add Exercise" button
+  secEl.insertBefore(form, secEl.querySelector('.add-ex-btn'));
+
+  form.querySelector('.save').addEventListener('click', () => {
+    const get = sel => form.querySelector(`[data-edit="${sel}"]`).value.trim();
+    const name = get('name');
+    if (!name) { alert('Name is required.'); return; }
+    const newEx = {
+      id: 'custom-' + Date.now(),
+      name,
+      equip: get('equip'),
+      reps: [get('rep0') || '—', get('rep1') || '—', get('rep2') || '—', get('rep3') || '—'],
+      cue: get('cue'),
+    };
+    section.exercises.push(newEx);
+    saveProgramAndRerender();
+  });
+
+  form.querySelector('.cancel').addEventListener('click', () => {
+    form.remove();
+  });
+
+  // Auto-focus the name field
+  setTimeout(() => form.querySelector('[data-edit="name"]').focus(), 50);
 }
 
 function renderExercise(ex, repIdx) {
@@ -401,60 +503,131 @@ function renderExercise(ex, repIdx) {
   card.dataset.exId = ex.id;
 
   const showLog = !ex.noLog;
-  card.innerHTML = `
-    <div class="ex-head">
-      <div class="ex-main">
-        <div class="ex-name">${ex.name}</div>
-        <div class="ex-equip">${ex.equip}</div>
+  const renderViewMode = () => {
+    card.innerHTML = `
+      <button class="ex-edit-btn" title="Edit">
+        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+      </button>
+      <div class="ex-head">
+        <div class="ex-main">
+          <div class="ex-name">${esc(ex.name)}</div>
+          <div class="ex-equip">${esc(ex.equip)}</div>
+        </div>
+        <div class="ex-reps"><div class="reps-big">${esc(ex.reps[repIdx])}</div></div>
       </div>
-      <div class="ex-reps"><div class="reps-big">${ex.reps[repIdx]}</div></div>
-    </div>
-    ${ex.cue ? `<div class="ex-cue">${ex.cue}</div>` : ''}
-    ${showLog ? `
-      <div class="ex-actions">
-        <button class="ex-action expand-btn">${log.set1 || log.set2 || log.set3 || log.notes ? 'Edit Log' : 'Log Sets'}</button>
-        <button class="ex-action complete ${done ? 'done' : ''}">${done ? '✓ Done' : 'Mark Done'}</button>
-      </div>
-      <div class="ex-log">
-        <div class="set-row"><label>SET 1</label><input type="text" data-field="set1" inputmode="text" placeholder="reps · weight · notes" value="${log.set1 || ''}"></div>
-        <div class="set-row"><label>SET 2</label><input type="text" data-field="set2" inputmode="text" placeholder="reps · weight · notes" value="${log.set2 || ''}"></div>
-        <div class="set-row"><label>SET 3</label><input type="text" data-field="set3" inputmode="text" placeholder="reps · weight · notes" value="${log.set3 || ''}"></div>
-        <label class="notes-label">NOTES / HOW IT FELT</label>
-        <textarea class="notes-input" data-field="notes" placeholder="">${log.notes || ''}</textarea>
-      </div>
-    ` : ''}
-  `;
+      ${ex.cue ? `<div class="ex-cue">${esc(ex.cue)}</div>` : ''}
+      ${showLog ? `
+        <div class="ex-actions">
+          <button class="ex-action expand-btn">${log.set1 || log.set2 || log.set3 || log.notes ? 'Edit Log' : 'Log Sets'}</button>
+          <button class="ex-action complete ${done ? 'done' : ''}">${done ? '✓ Done' : 'Mark Done'}</button>
+        </div>
+        <div class="ex-log">
+          <div class="set-row"><label>SET 1</label><input type="text" data-field="set1" inputmode="text" placeholder="reps · weight · notes" value="${esc(log.set1 || '')}"></div>
+          <div class="set-row"><label>SET 2</label><input type="text" data-field="set2" inputmode="text" placeholder="reps · weight · notes" value="${esc(log.set2 || '')}"></div>
+          <div class="set-row"><label>SET 3</label><input type="text" data-field="set3" inputmode="text" placeholder="reps · weight · notes" value="${esc(log.set3 || '')}"></div>
+          <label class="notes-label">NOTES / HOW IT FELT</label>
+          <textarea class="notes-input" data-field="notes" placeholder="">${esc(log.notes || '')}</textarea>
+        </div>
+      ` : ''}
+    `;
 
-  if (showLog) {
-    const expandBtn = card.querySelector('.expand-btn');
-    const completeBtn = card.querySelector('.complete');
-
-    expandBtn.addEventListener('click', () => {
-      card.classList.toggle('expanded');
+    // Edit button
+    card.querySelector('.ex-edit-btn').addEventListener('click', (e) => {
+      e.stopPropagation();
+      renderEditMode();
     });
 
-    completeBtn.addEventListener('click', () => {
-      const cur = STORAGE.getLog(STATE.selectedWeek, STATE.selectedDay, ex.id) || {};
-      cur.completed = !cur.completed;
-      STORAGE.setLog(STATE.selectedWeek, STATE.selectedDay, ex.id, cur);
-      renderWorkout();
-    });
+    if (showLog) {
+      const expandBtn = card.querySelector('.expand-btn');
+      const completeBtn = card.querySelector('.complete');
 
-    card.querySelectorAll('input, textarea').forEach(input => {
-      input.addEventListener('input', (e) => {
+      expandBtn.addEventListener('click', () => card.classList.toggle('expanded'));
+
+      completeBtn.addEventListener('click', () => {
         const cur = STORAGE.getLog(STATE.selectedWeek, STATE.selectedDay, ex.id) || {};
-        cur[e.target.dataset.field] = e.target.value;
+        cur.completed = !cur.completed;
         STORAGE.setLog(STATE.selectedWeek, STATE.selectedDay, ex.id, cur);
+        renderWorkout();
       });
+
+      card.querySelectorAll('input[data-field], textarea[data-field]').forEach(input => {
+        input.addEventListener('input', (e) => {
+          const cur = STORAGE.getLog(STATE.selectedWeek, STATE.selectedDay, ex.id) || {};
+          cur[e.target.dataset.field] = e.target.value;
+          STORAGE.setLog(STATE.selectedWeek, STATE.selectedDay, ex.id, cur);
+        });
+      });
+
+      if (log.set1 || log.set2 || log.set3 || log.notes) {
+        card.classList.add('expanded');
+      }
+    }
+  };
+
+  const renderEditMode = () => {
+    card.classList.add('editing');
+    const r = ex.reps || ['','','',''];
+    card.innerHTML = `
+      <div class="ex-edit-form">
+        <div class="edit-title">Edit Exercise</div>
+        <div class="edit-row"><label>NAME</label><input type="text" data-edit="name" value="${esc(ex.name)}"></div>
+        <div class="edit-row"><label>EQUIPMENT</label><input type="text" data-edit="equip" value="${esc(ex.equip || '')}"></div>
+        <div class="edit-row-group">
+          <div class="edit-row-group-label">SETS × REPS BY PHASE</div>
+          <div class="edit-row tight"><label>Wk 1–2</label><input type="text" data-edit="rep0" value="${esc(r[0] || '')}"></div>
+          <div class="edit-row tight"><label>Wk 3–4</label><input type="text" data-edit="rep1" value="${esc(r[1] || '')}"></div>
+          <div class="edit-row tight"><label>Wk 5–6</label><input type="text" data-edit="rep2" value="${esc(r[2] || '')}"></div>
+          <div class="edit-row tight"><label>Wk 7–8</label><input type="text" data-edit="rep3" value="${esc(r[3] || '')}"></div>
+        </div>
+        <div class="edit-row col"><label>COACHING CUE</label><textarea data-edit="cue" rows="4">${esc(ex.cue || '')}</textarea></div>
+        <div class="edit-actions">
+          <button class="edit-btn save">Save</button>
+          <button class="edit-btn cancel">Cancel</button>
+          <button class="edit-btn delete">Delete</button>
+        </div>
+      </div>
+    `;
+
+    card.querySelector('.save').addEventListener('click', () => {
+      const get = sel => card.querySelector(`[data-edit="${sel}"]`).value.trim();
+      const newName = get('name');
+      if (!newName) { alert('Name is required.'); return; }
+      // Find the exercise in DAYS and mutate it
+      const found = findExerciseInDays(ex.id);
+      if (!found) return;
+      found.ex.name = newName;
+      found.ex.equip = get('equip');
+      found.ex.reps = [get('rep0'), get('rep1'), get('rep2'), get('rep3')];
+      found.ex.cue = get('cue');
+      saveProgramAndRerender();
     });
 
-    // Auto-expand if any field has data
-    if (log.set1 || log.set2 || log.set3 || log.notes) {
-      card.classList.add('expanded');
-    }
-  }
+    card.querySelector('.cancel').addEventListener('click', () => {
+      renderViewMode();
+    });
 
+    card.querySelector('.delete').addEventListener('click', () => {
+      if (!confirm(`Delete "${ex.name}"? This removes it from this day permanently (you can reset to defaults in Info).`)) return;
+      const found = findExerciseInDays(ex.id);
+      if (!found) return;
+      found.section.exercises.splice(found.idx, 1);
+      saveProgramAndRerender();
+    });
+  };
+
+  renderViewMode();
   return card;
+}
+
+// Find an exercise by id across the currently selected day's sections
+function findExerciseInDays(exId) {
+  const day = DAYS[STATE.selectedDay];
+  if (!day) return null;
+  for (const section of day.sections) {
+    const idx = section.exercises.findIndex(e => e.id === exId);
+    if (idx !== -1) return { section, ex: section.exercises[idx], idx };
+  }
+  return null;
 }
 
 function renderProgress() {
@@ -543,10 +716,20 @@ function renderInfo() {
 
       <div class="info-block">
         <h2>Data</h2>
-        <div class="info-item"><div class="ii-body">All logged sets and progress are stored on this device only. They'll persist as long as you don't clear your browser data. Add this page to your home screen to use it like an app.</div></div>
+        <div class="info-item"><div class="ii-body">All logged sets, session notes, and program edits are stored on this device only. They'll persist as long as you don't clear your browser data. Add this page to your home screen to use it like an app.</div></div>
+        <button class="reset-btn" id="resetProgramBtn">Reset Program to Defaults</button>
+        <div class="info-item" style="margin-top: 6px;"><div class="ii-body" style="font-size: 12px;">Reset wipes your exercise edits, additions, and deletions — but keeps your set logs, session notes, and progress data.</div></div>
       </div>
     </div>
   `;
+
+  document.getElementById('resetProgramBtn').addEventListener('click', () => {
+    if (!confirm('Reset all exercise edits, additions, and deletions back to the original program? Your set logs and progress data will be kept.')) return;
+    STORAGE.resetProgram();
+    DAYS = JSON.parse(JSON.stringify(DEFAULT_DAYS));
+    renderWorkout();
+    setView('workout');
+  });
 }
 
 function setView(view) {

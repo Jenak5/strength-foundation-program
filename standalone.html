@@ -82,9 +82,14 @@
   .section-head .title { font-size: 11px; letter-spacing: 0.22em; font-weight: 500; color: var(--text-dim); }
   .section-head .duration { font-size: 11px; color: var(--text-faint); font-family: 'JetBrains Mono', monospace; }
 
-  .ex { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; margin-bottom: 12px; overflow: hidden; transition: border-color 0.2s, background 0.2s; }
+  .ex { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; margin-bottom: 12px; overflow: hidden; transition: border-color 0.2s, background 0.2s; position: relative; }
   .ex.done { border-color: var(--done); background: rgba(90,216,137,0.04); }
-  .ex-head { padding: 16px 18px 14px; display: flex; gap: 14px; align-items: flex-start; }
+  .ex.editing { border-color: var(--accent-dim); background: var(--surface-2); }
+
+  .ex-edit-btn { position: absolute; top: 10px; right: 10px; width: 28px; height: 28px; border-radius: 6px; color: var(--text-faint); display: flex; align-items: center; justify-content: center; transition: color 0.15s, background 0.15s; z-index: 2; }
+  .ex-edit-btn:active { background: var(--surface-2); color: var(--accent); }
+
+  .ex-head { padding: 16px 44px 14px 18px; display: flex; gap: 14px; align-items: flex-start; }
   .ex-main { flex: 1; min-width: 0; }
   .ex-name { font-size: 17px; font-weight: 700; line-height: 1.25; margin-bottom: 4px; }
   .ex-equip { font-size: 11.5px; color: var(--text-faint); letter-spacing: 0.03em; }
@@ -106,6 +111,42 @@
   .notes-input { width: 100%; padding: 10px 12px; background: var(--bg); border: 1px solid var(--border); border-radius: 8px; font-size: 14px; resize: vertical; min-height: 56px; margin-top: 6px; line-height: 1.4; }
   .notes-input:focus { border-color: var(--accent-dim); }
   .notes-label { font-size: 10px; color: var(--text-faint); letter-spacing: 0.14em; margin-top: 12px; display: block; }
+
+  /* EDIT MODE */
+  .ex-edit-form { padding: 18px; }
+  .edit-title { font-size: 11px; letter-spacing: 0.22em; color: var(--accent); font-weight: 500; margin-bottom: 14px; }
+  .edit-row { display: flex; gap: 10px; align-items: center; margin-bottom: 10px; }
+  .edit-row.tight { margin-bottom: 6px; }
+  .edit-row.col { flex-direction: column; align-items: stretch; gap: 6px; }
+  .edit-row label { font-size: 10px; color: var(--text-faint); letter-spacing: 0.14em; font-weight: 500; width: 78px; flex-shrink: 0; }
+  .edit-row.col label { width: auto; }
+  .edit-row input, .edit-row textarea { flex: 1; padding: 9px 12px; background: var(--bg); border: 1px solid var(--border); border-radius: 8px; font-size: 14.5px; transition: border-color 0.15s; width: 100%; }
+  .edit-row input:focus, .edit-row textarea:focus { border-color: var(--accent-dim); }
+  .edit-row textarea { font-family: inherit; resize: vertical; line-height: 1.45; }
+  .edit-row-group { margin: 14px 0 12px; padding: 12px; background: var(--bg); border: 1px solid var(--border); border-radius: 10px; }
+  .edit-row-group-label { font-size: 10px; color: var(--accent); letter-spacing: 0.16em; font-weight: 500; margin-bottom: 10px; }
+  .edit-actions { display: flex; gap: 8px; margin-top: 16px; }
+  .edit-btn { flex: 1; padding: 11px; border-radius: 8px; font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase; font-weight: 600; transition: background 0.15s, opacity 0.15s; }
+  .edit-btn.save { background: var(--accent); color: #000; }
+  .edit-btn.save:active { opacity: 0.8; }
+  .edit-btn.cancel { background: var(--border); color: var(--text); }
+  .edit-btn.delete { background: transparent; color: #ff5555; border: 1px solid #ff5555; }
+  .edit-btn.delete:active { background: rgba(255,85,85,0.1); }
+
+  /* SESSION NOTES */
+  .session-notes-block { padding: 4px 20px 8px; }
+  .session-notes-label { display: block; font-size: 10px; color: var(--text-faint); letter-spacing: 0.18em; font-weight: 500; margin-bottom: 8px; }
+  .session-notes-input { width: 100%; padding: 12px 14px; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; font-size: 14px; line-height: 1.5; min-height: 64px; resize: vertical; font-family: inherit; color: var(--text); transition: border-color 0.15s; }
+  .session-notes-input:focus { border-color: var(--accent-dim); }
+
+  /* ADD EXERCISE */
+  .add-ex-btn { display: block; width: 100%; padding: 14px; margin-top: 6px; background: transparent; border: 1px dashed var(--border-strong); border-radius: 12px; color: var(--text-dim); font-size: 13px; letter-spacing: 0.08em; font-weight: 500; transition: color 0.15s, border-color 0.15s; }
+  .add-ex-btn:active { color: var(--accent); border-color: var(--accent-dim); }
+  .add-ex-form { border-color: var(--accent-dim); }
+
+  /* RESET BUTTON */
+  .reset-btn { display: block; width: 100%; padding: 14px; margin-top: 14px; background: transparent; border: 1px solid #ff5555; border-radius: 10px; color: #ff5555; font-size: 13px; letter-spacing: 0.1em; font-weight: 600; text-transform: uppercase; transition: background 0.15s; }
+  .reset-btn:active { background: rgba(255,85,85,0.1); }
 
   .progress-view, .info-view { padding: 28px 20px 40px; }
   .progress-view h1, .info-view h1 { font-size: 40px; margin-bottom: 6px; line-height: 0.95; }
@@ -195,14 +236,20 @@
 // STRENGTH FOUNDATION PROGRAM — APP LOGIC
 // ============================================================
 
-const PROGRAM_START = new Date(2026, 4, 7); // May 7, 2026 (Thu) — Wk 1 Day B
-const PROGRAM_END   = new Date(2026, 5, 30); // Jun 30, 2026 (Tue) — Wk 8 Day A
+// HTML escape for safely rendering user-typed strings inside templates
+function esc(s) {
+  if (s == null) return '';
+  return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+const PROGRAM_START = new Date(2026, 4, 19); // May 19, 2026 (Tue) — Wk 1 Day A
+const PROGRAM_END   = new Date(2026, 6, 11); // Jul 11, 2026 (Sat) — Wk 8 Day C
 
 // ============================================================
-// EXERCISE DATA
+// EXERCISE DATA — DEFAULT PROGRAM (seed; user can override in app)
 // reps array indexed by phase block: [Wk1-2, Wk3-4, Wk5-6, Wk7-8]
 // ============================================================
-const DAYS = {
+const DEFAULT_DAYS = {
   A: {
     title: 'Day A',
     sub: 'Lower Body + Core',
@@ -460,11 +507,11 @@ function getNextWorkout(today = new Date()) {
 }
 
 function getSessionDate(dayKey, week) {
-  // Week 1 Day B = May 7. Week N Day X = ?
-  // Within week N: Day B is anchor (day 0), Day C is day 0+2, Day A is day 0+5
+  // Program week starts on Tuesday with Day A. Wk N Day A = PROGRAM_START + (N-1)*7 days.
+  // Within a week: Day A = day 0 (Tue), Day B = day 2 (Thu), Day C = day 4 (Sat)
   const anchor = new Date(PROGRAM_START);
   anchor.setDate(anchor.getDate() + (week - 1) * 7);
-  const offset = dayKey === 'B' ? 0 : dayKey === 'C' ? 2 : 5;
+  const offset = dayKey === 'A' ? 0 : dayKey === 'B' ? 2 : 4;
   const dt = new Date(anchor);
   dt.setDate(dt.getDate() + offset);
   return dt;
@@ -495,7 +542,34 @@ const STORAGE = {
     const log = this.getLog(week, dayKey, exId);
     return log && log.completed;
   },
+  // Session-level notes (one per workout day per week)
+  setSessionNote(week, dayKey, text) {
+    const k = `sess-note:wk${week}:${dayKey}`;
+    if (text && text.trim()) localStorage.setItem(k, text);
+    else localStorage.removeItem(k);
+  },
+  getSessionNote(week, dayKey) {
+    return localStorage.getItem(`sess-note:wk${week}:${dayKey}`) || '';
+  },
+  // Program customization (the entire DAYS object, edited by the user)
+  saveProgram(days) {
+    localStorage.setItem('program-v1', JSON.stringify(days));
+  },
+  loadProgram() {
+    const v = localStorage.getItem('program-v1');
+    return v ? JSON.parse(v) : null;
+  },
+  resetProgram() {
+    localStorage.removeItem('program-v1');
+  },
 };
+
+// Mutable program — seeded from DEFAULT_DAYS, but user edits persist to localStorage
+let DAYS = STORAGE.loadProgram() || JSON.parse(JSON.stringify(DEFAULT_DAYS));
+function saveProgramAndRerender() {
+  STORAGE.saveProgram(DAYS);
+  renderWorkout();
+}
 
 // ============================================================
 // STATE
@@ -531,7 +605,7 @@ function renderWorkout() {
 
   // Pre-program
   if (STATE.selectedWeek === 0) {
-    v.innerHTML = `<div class="rest-day"><div class="rest-icon">⌃</div><h1 class="display">Program Starts Soon</h1><p>First session: Thu May 7, 2026 — Day B (Upper Body)</p></div>`;
+    v.innerHTML = `<div class="rest-day"><div class="rest-icon">⌃</div><h1 class="display">Program Starts Soon</h1><p>First session: Tue May 19, 2026 — Day A (Lower Body)</p></div>`;
     return;
   }
   if (STATE.selectedWeek === 9) {
@@ -554,15 +628,27 @@ function renderWorkout() {
   header.className = 'day-header';
   const todayBadge = isToday ? `<span style="color: var(--accent); font-size: 11px; letter-spacing: 0.18em; margin-left: 8px;">· TODAY</span>` : '';
   header.innerHTML = `
-    <div class="focus">${day.weekdayLong.toUpperCase()} · ${fmtDate(sessionDate).toUpperCase()}${todayBadge}</div>
-    <h1 class="display">${day.title}<span class="sub">${day.sub}</span></h1>
+    <div class="focus">${esc(day.weekdayLong.toUpperCase())} · ${esc(fmtDate(sessionDate).toUpperCase())}${todayBadge}</div>
+    <h1 class="display">${esc(day.title)}<span class="sub">${esc(day.sub)}</span></h1>
     <div class="session-meta">
-      ${day.duration} · ${day.equipment}
+      ${esc(day.duration)} · ${esc(day.equipment)}
       ${day.injection ? '<span class="injection-tag">💉 Injection Day</span>' : ''}
     </div>
-    ${day.notes ? `<div class="session-meta" style="margin-top: 6px; font-style: italic;">${day.notes}</div>` : ''}
+    ${day.notes ? `<div class="session-meta" style="margin-top: 6px; font-style: italic;">${esc(day.notes)}</div>` : ''}
   `;
   v.appendChild(header);
+
+  // Session-level notes (one per workout day per week)
+  const noteBlock = document.createElement('div');
+  noteBlock.className = 'session-notes-block';
+  noteBlock.innerHTML = `
+    <label class="session-notes-label">SESSION NOTES — WK ${STATE.selectedWeek} ${esc(day.title)}</label>
+    <textarea class="session-notes-input" placeholder="How did today go? Energy, mood, weather, anything off…">${esc(STORAGE.getSessionNote(STATE.selectedWeek, STATE.selectedDay))}</textarea>
+  `;
+  noteBlock.querySelector('textarea').addEventListener('input', (e) => {
+    STORAGE.setSessionNote(STATE.selectedWeek, STATE.selectedDay, e.target.value);
+  });
+  v.appendChild(noteBlock);
 
   // Completion banner if all loggable exercises done
   const loggables = day.sections.flatMap(s => s.exercises.filter(e => !e.noLog));
@@ -575,15 +661,72 @@ function renderWorkout() {
   }
 
   // Sections
-  day.sections.forEach(section => {
+  day.sections.forEach((section, sIdx) => {
     const secEl = document.createElement('section');
     secEl.className = 'section';
-    secEl.innerHTML = `<div class="section-head"><div class="title">${section.title}</div>${section.duration ? `<div class="duration">${section.duration}</div>` : ''}</div>`;
+    secEl.innerHTML = `<div class="section-head"><div class="title">${esc(section.title)}</div>${section.duration ? `<div class="duration">${esc(section.duration)}</div>` : ''}</div>`;
     section.exercises.forEach(ex => {
       secEl.appendChild(renderExercise(ex, repIdx));
     });
+    // "Add Exercise" button per section
+    const addBtn = document.createElement('button');
+    addBtn.className = 'add-ex-btn';
+    addBtn.innerHTML = '+ Add Exercise';
+    addBtn.addEventListener('click', () => openAddExerciseForm(secEl, section));
+    secEl.appendChild(addBtn);
     v.appendChild(secEl);
   });
+}
+
+// Open inline "add exercise" form within a section element
+function openAddExerciseForm(secEl, section) {
+  // Don't double-open
+  if (secEl.querySelector('.add-ex-form')) return;
+  const form = document.createElement('div');
+  form.className = 'ex add-ex-form editing';
+  form.innerHTML = `
+    <div class="ex-edit-form">
+      <div class="edit-title">Add Exercise</div>
+      <div class="edit-row"><label>NAME</label><input type="text" data-edit="name" placeholder="e.g., Banded Pull-Apart"></div>
+      <div class="edit-row"><label>EQUIPMENT</label><input type="text" data-edit="equip" placeholder="e.g., Band"></div>
+      <div class="edit-row-group">
+        <div class="edit-row-group-label">SETS × REPS BY PHASE</div>
+        <div class="edit-row tight"><label>Wk 1–2</label><input type="text" data-edit="rep0" placeholder="2×10"></div>
+        <div class="edit-row tight"><label>Wk 3–4</label><input type="text" data-edit="rep1" placeholder="3×10"></div>
+        <div class="edit-row tight"><label>Wk 5–6</label><input type="text" data-edit="rep2" placeholder="3×12"></div>
+        <div class="edit-row tight"><label>Wk 7–8</label><input type="text" data-edit="rep3" placeholder="3×15"></div>
+      </div>
+      <div class="edit-row col"><label>COACHING CUE (optional)</label><textarea data-edit="cue" rows="3" placeholder="Form notes, what to focus on…"></textarea></div>
+      <div class="edit-actions">
+        <button class="edit-btn save">Add</button>
+        <button class="edit-btn cancel">Cancel</button>
+      </div>
+    </div>
+  `;
+  // Insert before the "+ Add Exercise" button
+  secEl.insertBefore(form, secEl.querySelector('.add-ex-btn'));
+
+  form.querySelector('.save').addEventListener('click', () => {
+    const get = sel => form.querySelector(`[data-edit="${sel}"]`).value.trim();
+    const name = get('name');
+    if (!name) { alert('Name is required.'); return; }
+    const newEx = {
+      id: 'custom-' + Date.now(),
+      name,
+      equip: get('equip'),
+      reps: [get('rep0') || '—', get('rep1') || '—', get('rep2') || '—', get('rep3') || '—'],
+      cue: get('cue'),
+    };
+    section.exercises.push(newEx);
+    saveProgramAndRerender();
+  });
+
+  form.querySelector('.cancel').addEventListener('click', () => {
+    form.remove();
+  });
+
+  // Auto-focus the name field
+  setTimeout(() => form.querySelector('[data-edit="name"]').focus(), 50);
 }
 
 function renderExercise(ex, repIdx) {
@@ -594,60 +737,131 @@ function renderExercise(ex, repIdx) {
   card.dataset.exId = ex.id;
 
   const showLog = !ex.noLog;
-  card.innerHTML = `
-    <div class="ex-head">
-      <div class="ex-main">
-        <div class="ex-name">${ex.name}</div>
-        <div class="ex-equip">${ex.equip}</div>
+  const renderViewMode = () => {
+    card.innerHTML = `
+      <button class="ex-edit-btn" title="Edit">
+        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+      </button>
+      <div class="ex-head">
+        <div class="ex-main">
+          <div class="ex-name">${esc(ex.name)}</div>
+          <div class="ex-equip">${esc(ex.equip)}</div>
+        </div>
+        <div class="ex-reps"><div class="reps-big">${esc(ex.reps[repIdx])}</div></div>
       </div>
-      <div class="ex-reps"><div class="reps-big">${ex.reps[repIdx]}</div></div>
-    </div>
-    ${ex.cue ? `<div class="ex-cue">${ex.cue}</div>` : ''}
-    ${showLog ? `
-      <div class="ex-actions">
-        <button class="ex-action expand-btn">${log.set1 || log.set2 || log.set3 || log.notes ? 'Edit Log' : 'Log Sets'}</button>
-        <button class="ex-action complete ${done ? 'done' : ''}">${done ? '✓ Done' : 'Mark Done'}</button>
-      </div>
-      <div class="ex-log">
-        <div class="set-row"><label>SET 1</label><input type="text" data-field="set1" inputmode="text" placeholder="reps · weight · notes" value="${log.set1 || ''}"></div>
-        <div class="set-row"><label>SET 2</label><input type="text" data-field="set2" inputmode="text" placeholder="reps · weight · notes" value="${log.set2 || ''}"></div>
-        <div class="set-row"><label>SET 3</label><input type="text" data-field="set3" inputmode="text" placeholder="reps · weight · notes" value="${log.set3 || ''}"></div>
-        <label class="notes-label">NOTES / HOW IT FELT</label>
-        <textarea class="notes-input" data-field="notes" placeholder="">${log.notes || ''}</textarea>
-      </div>
-    ` : ''}
-  `;
+      ${ex.cue ? `<div class="ex-cue">${esc(ex.cue)}</div>` : ''}
+      ${showLog ? `
+        <div class="ex-actions">
+          <button class="ex-action expand-btn">${log.set1 || log.set2 || log.set3 || log.notes ? 'Edit Log' : 'Log Sets'}</button>
+          <button class="ex-action complete ${done ? 'done' : ''}">${done ? '✓ Done' : 'Mark Done'}</button>
+        </div>
+        <div class="ex-log">
+          <div class="set-row"><label>SET 1</label><input type="text" data-field="set1" inputmode="text" placeholder="reps · weight · notes" value="${esc(log.set1 || '')}"></div>
+          <div class="set-row"><label>SET 2</label><input type="text" data-field="set2" inputmode="text" placeholder="reps · weight · notes" value="${esc(log.set2 || '')}"></div>
+          <div class="set-row"><label>SET 3</label><input type="text" data-field="set3" inputmode="text" placeholder="reps · weight · notes" value="${esc(log.set3 || '')}"></div>
+          <label class="notes-label">NOTES / HOW IT FELT</label>
+          <textarea class="notes-input" data-field="notes" placeholder="">${esc(log.notes || '')}</textarea>
+        </div>
+      ` : ''}
+    `;
 
-  if (showLog) {
-    const expandBtn = card.querySelector('.expand-btn');
-    const completeBtn = card.querySelector('.complete');
-
-    expandBtn.addEventListener('click', () => {
-      card.classList.toggle('expanded');
+    // Edit button
+    card.querySelector('.ex-edit-btn').addEventListener('click', (e) => {
+      e.stopPropagation();
+      renderEditMode();
     });
 
-    completeBtn.addEventListener('click', () => {
-      const cur = STORAGE.getLog(STATE.selectedWeek, STATE.selectedDay, ex.id) || {};
-      cur.completed = !cur.completed;
-      STORAGE.setLog(STATE.selectedWeek, STATE.selectedDay, ex.id, cur);
-      renderWorkout();
-    });
+    if (showLog) {
+      const expandBtn = card.querySelector('.expand-btn');
+      const completeBtn = card.querySelector('.complete');
 
-    card.querySelectorAll('input, textarea').forEach(input => {
-      input.addEventListener('input', (e) => {
+      expandBtn.addEventListener('click', () => card.classList.toggle('expanded'));
+
+      completeBtn.addEventListener('click', () => {
         const cur = STORAGE.getLog(STATE.selectedWeek, STATE.selectedDay, ex.id) || {};
-        cur[e.target.dataset.field] = e.target.value;
+        cur.completed = !cur.completed;
         STORAGE.setLog(STATE.selectedWeek, STATE.selectedDay, ex.id, cur);
+        renderWorkout();
       });
+
+      card.querySelectorAll('input[data-field], textarea[data-field]').forEach(input => {
+        input.addEventListener('input', (e) => {
+          const cur = STORAGE.getLog(STATE.selectedWeek, STATE.selectedDay, ex.id) || {};
+          cur[e.target.dataset.field] = e.target.value;
+          STORAGE.setLog(STATE.selectedWeek, STATE.selectedDay, ex.id, cur);
+        });
+      });
+
+      if (log.set1 || log.set2 || log.set3 || log.notes) {
+        card.classList.add('expanded');
+      }
+    }
+  };
+
+  const renderEditMode = () => {
+    card.classList.add('editing');
+    const r = ex.reps || ['','','',''];
+    card.innerHTML = `
+      <div class="ex-edit-form">
+        <div class="edit-title">Edit Exercise</div>
+        <div class="edit-row"><label>NAME</label><input type="text" data-edit="name" value="${esc(ex.name)}"></div>
+        <div class="edit-row"><label>EQUIPMENT</label><input type="text" data-edit="equip" value="${esc(ex.equip || '')}"></div>
+        <div class="edit-row-group">
+          <div class="edit-row-group-label">SETS × REPS BY PHASE</div>
+          <div class="edit-row tight"><label>Wk 1–2</label><input type="text" data-edit="rep0" value="${esc(r[0] || '')}"></div>
+          <div class="edit-row tight"><label>Wk 3–4</label><input type="text" data-edit="rep1" value="${esc(r[1] || '')}"></div>
+          <div class="edit-row tight"><label>Wk 5–6</label><input type="text" data-edit="rep2" value="${esc(r[2] || '')}"></div>
+          <div class="edit-row tight"><label>Wk 7–8</label><input type="text" data-edit="rep3" value="${esc(r[3] || '')}"></div>
+        </div>
+        <div class="edit-row col"><label>COACHING CUE</label><textarea data-edit="cue" rows="4">${esc(ex.cue || '')}</textarea></div>
+        <div class="edit-actions">
+          <button class="edit-btn save">Save</button>
+          <button class="edit-btn cancel">Cancel</button>
+          <button class="edit-btn delete">Delete</button>
+        </div>
+      </div>
+    `;
+
+    card.querySelector('.save').addEventListener('click', () => {
+      const get = sel => card.querySelector(`[data-edit="${sel}"]`).value.trim();
+      const newName = get('name');
+      if (!newName) { alert('Name is required.'); return; }
+      // Find the exercise in DAYS and mutate it
+      const found = findExerciseInDays(ex.id);
+      if (!found) return;
+      found.ex.name = newName;
+      found.ex.equip = get('equip');
+      found.ex.reps = [get('rep0'), get('rep1'), get('rep2'), get('rep3')];
+      found.ex.cue = get('cue');
+      saveProgramAndRerender();
     });
 
-    // Auto-expand if any field has data
-    if (log.set1 || log.set2 || log.set3 || log.notes) {
-      card.classList.add('expanded');
-    }
-  }
+    card.querySelector('.cancel').addEventListener('click', () => {
+      renderViewMode();
+    });
 
+    card.querySelector('.delete').addEventListener('click', () => {
+      if (!confirm(`Delete "${ex.name}"? This removes it from this day permanently (you can reset to defaults in Info).`)) return;
+      const found = findExerciseInDays(ex.id);
+      if (!found) return;
+      found.section.exercises.splice(found.idx, 1);
+      saveProgramAndRerender();
+    });
+  };
+
+  renderViewMode();
   return card;
+}
+
+// Find an exercise by id across the currently selected day's sections
+function findExerciseInDays(exId) {
+  const day = DAYS[STATE.selectedDay];
+  if (!day) return null;
+  for (const section of day.sections) {
+    const idx = section.exercises.findIndex(e => e.id === exId);
+    if (idx !== -1) return { section, ex: section.exercises[idx], idx };
+  }
+  return null;
 }
 
 function renderProgress() {
@@ -736,10 +950,20 @@ function renderInfo() {
 
       <div class="info-block">
         <h2>Data</h2>
-        <div class="info-item"><div class="ii-body">All logged sets and progress are stored on this device only. They'll persist as long as you don't clear your browser data. Add this page to your home screen to use it like an app.</div></div>
+        <div class="info-item"><div class="ii-body">All logged sets, session notes, and program edits are stored on this device only. They'll persist as long as you don't clear your browser data. Add this page to your home screen to use it like an app.</div></div>
+        <button class="reset-btn" id="resetProgramBtn">Reset Program to Defaults</button>
+        <div class="info-item" style="margin-top: 6px;"><div class="ii-body" style="font-size: 12px;">Reset wipes your exercise edits, additions, and deletions — but keeps your set logs, session notes, and progress data.</div></div>
       </div>
     </div>
   `;
+
+  document.getElementById('resetProgramBtn').addEventListener('click', () => {
+    if (!confirm('Reset all exercise edits, additions, and deletions back to the original program? Your set logs and progress data will be kept.')) return;
+    STORAGE.resetProgram();
+    DAYS = JSON.parse(JSON.stringify(DEFAULT_DAYS));
+    renderWorkout();
+    setView('workout');
+  });
 }
 
 function setView(view) {

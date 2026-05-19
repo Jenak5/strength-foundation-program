@@ -82,9 +82,14 @@
   .section-head .title { font-size: 11px; letter-spacing: 0.22em; font-weight: 500; color: var(--text-dim); }
   .section-head .duration { font-size: 11px; color: var(--text-faint); font-family: 'JetBrains Mono', monospace; }
 
-  .ex { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; margin-bottom: 12px; overflow: hidden; transition: border-color 0.2s, background 0.2s; }
+  .ex { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; margin-bottom: 12px; overflow: hidden; transition: border-color 0.2s, background 0.2s; position: relative; }
   .ex.done { border-color: var(--done); background: rgba(90,216,137,0.04); }
-  .ex-head { padding: 16px 18px 14px; display: flex; gap: 14px; align-items: flex-start; }
+  .ex.editing { border-color: var(--accent-dim); background: var(--surface-2); }
+
+  .ex-edit-btn { position: absolute; top: 10px; right: 10px; width: 28px; height: 28px; border-radius: 6px; color: var(--text-faint); display: flex; align-items: center; justify-content: center; transition: color 0.15s, background 0.15s; z-index: 2; }
+  .ex-edit-btn:active { background: var(--surface-2); color: var(--accent); }
+
+  .ex-head { padding: 16px 44px 14px 18px; display: flex; gap: 14px; align-items: flex-start; }
   .ex-main { flex: 1; min-width: 0; }
   .ex-name { font-size: 17px; font-weight: 700; line-height: 1.25; margin-bottom: 4px; }
   .ex-equip { font-size: 11.5px; color: var(--text-faint); letter-spacing: 0.03em; }
@@ -106,6 +111,42 @@
   .notes-input { width: 100%; padding: 10px 12px; background: var(--bg); border: 1px solid var(--border); border-radius: 8px; font-size: 14px; resize: vertical; min-height: 56px; margin-top: 6px; line-height: 1.4; }
   .notes-input:focus { border-color: var(--accent-dim); }
   .notes-label { font-size: 10px; color: var(--text-faint); letter-spacing: 0.14em; margin-top: 12px; display: block; }
+
+  /* EDIT MODE */
+  .ex-edit-form { padding: 18px; }
+  .edit-title { font-size: 11px; letter-spacing: 0.22em; color: var(--accent); font-weight: 500; margin-bottom: 14px; }
+  .edit-row { display: flex; gap: 10px; align-items: center; margin-bottom: 10px; }
+  .edit-row.tight { margin-bottom: 6px; }
+  .edit-row.col { flex-direction: column; align-items: stretch; gap: 6px; }
+  .edit-row label { font-size: 10px; color: var(--text-faint); letter-spacing: 0.14em; font-weight: 500; width: 78px; flex-shrink: 0; }
+  .edit-row.col label { width: auto; }
+  .edit-row input, .edit-row textarea { flex: 1; padding: 9px 12px; background: var(--bg); border: 1px solid var(--border); border-radius: 8px; font-size: 14.5px; transition: border-color 0.15s; width: 100%; }
+  .edit-row input:focus, .edit-row textarea:focus { border-color: var(--accent-dim); }
+  .edit-row textarea { font-family: inherit; resize: vertical; line-height: 1.45; }
+  .edit-row-group { margin: 14px 0 12px; padding: 12px; background: var(--bg); border: 1px solid var(--border); border-radius: 10px; }
+  .edit-row-group-label { font-size: 10px; color: var(--accent); letter-spacing: 0.16em; font-weight: 500; margin-bottom: 10px; }
+  .edit-actions { display: flex; gap: 8px; margin-top: 16px; }
+  .edit-btn { flex: 1; padding: 11px; border-radius: 8px; font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase; font-weight: 600; transition: background 0.15s, opacity 0.15s; }
+  .edit-btn.save { background: var(--accent); color: #000; }
+  .edit-btn.save:active { opacity: 0.8; }
+  .edit-btn.cancel { background: var(--border); color: var(--text); }
+  .edit-btn.delete { background: transparent; color: #ff5555; border: 1px solid #ff5555; }
+  .edit-btn.delete:active { background: rgba(255,85,85,0.1); }
+
+  /* SESSION NOTES */
+  .session-notes-block { padding: 4px 20px 8px; }
+  .session-notes-label { display: block; font-size: 10px; color: var(--text-faint); letter-spacing: 0.18em; font-weight: 500; margin-bottom: 8px; }
+  .session-notes-input { width: 100%; padding: 12px 14px; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; font-size: 14px; line-height: 1.5; min-height: 64px; resize: vertical; font-family: inherit; color: var(--text); transition: border-color 0.15s; }
+  .session-notes-input:focus { border-color: var(--accent-dim); }
+
+  /* ADD EXERCISE */
+  .add-ex-btn { display: block; width: 100%; padding: 14px; margin-top: 6px; background: transparent; border: 1px dashed var(--border-strong); border-radius: 12px; color: var(--text-dim); font-size: 13px; letter-spacing: 0.08em; font-weight: 500; transition: color 0.15s, border-color 0.15s; }
+  .add-ex-btn:active { color: var(--accent); border-color: var(--accent-dim); }
+  .add-ex-form { border-color: var(--accent-dim); }
+
+  /* RESET BUTTON */
+  .reset-btn { display: block; width: 100%; padding: 14px; margin-top: 14px; background: transparent; border: 1px solid #ff5555; border-radius: 10px; color: #ff5555; font-size: 13px; letter-spacing: 0.1em; font-weight: 600; text-transform: uppercase; transition: background 0.15s; }
+  .reset-btn:active { background: rgba(255,85,85,0.1); }
 
   .progress-view, .info-view { padding: 28px 20px 40px; }
   .progress-view h1, .info-view h1 { font-size: 40px; margin-bottom: 6px; line-height: 0.95; }
