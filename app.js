@@ -188,6 +188,68 @@ const DEFAULT_DAYS = {
       ]},
     ],
   },
+
+  M: {
+    title: 'Day M',
+    sub: 'Mobility & Recovery',
+    weekday: null, // Not tied to a specific weekday — use any day
+    weekdayShort: 'Any',
+    weekdayLong: 'Any Day',
+    duration: '~20 min',
+    equipment: 'Mat · Light Band · TRX · Foam Roller (optional)',
+    injection: false,
+    notes: 'Use on low-energy days, true rest days, or as a strength-day swap. Move slow, breathe deep.',
+    sections: [
+      { title: 'WARM-UP', duration: '2 min', exercises: [
+        { id: 'M-w1', name: 'Cat-Cow Flow', equip: 'Mat',
+          reps: ['2×8','2×10','3×8','3×10'],
+          cue: 'On hands and knees. Move segment by segment — pelvis tucks first, then low back, then mid, then neck. Inhale into extension, exhale into flexion. Slow.' },
+      ]},
+      { title: 'HIPS', duration: '6 min', exercises: [
+        { id: 'M-h1', name: '90/90 Hip Switches', equip: 'Mat',
+          reps: ['2×6 ea','2×8 ea','3×8 ea','3×10 ea'],
+          cue: 'Seated, one leg in front at 90°, other to the side at 90°. Sit tall, then switch sides by rotating the hips, knees brushing the floor. Don\'t use your hands — let your hips do the work.' },
+        { id: 'M-h2', name: 'Lizard Lunge w/ T-Spine Rotation', equip: 'Mat',
+          reps: ['30 sec ea','45 sec ea','60 sec ea + 5 rotations','60 sec ea + 8 rotations'],
+          cue: 'Deep lunge, front foot wide, back knee on floor. Both hands inside front foot. Reach the inside arm up and rotate the chest open toward the ceiling. Slow and controlled.' },
+        { id: 'M-h3', name: 'Pigeon Pose', equip: 'Mat',
+          reps: ['30 sec ea','45 sec ea','60 sec ea','60 sec ea'],
+          cue: 'Front shin angled across the mat, back leg long behind you. Stack hips square. Fold forward only as far as the hip allows — never force it. Breathe into the glute.' },
+      ]},
+      { title: 'T-SPINE & SHOULDERS', duration: '5 min', exercises: [
+        { id: 'M-t1', name: 'Thread the Needle', equip: 'Mat',
+          reps: ['2×5 ea','2×8 ea','3×8 ea','3×10 ea'],
+          cue: 'On hands and knees. Reach one arm under and across, lowering the shoulder to the mat. Rotate from the upper back, not the low back. Pause, return, switch.' },
+        { id: 'M-t2', name: 'Open Book', equip: 'Mat',
+          reps: ['2×6 ea','2×8 ea','3×8 ea','3×10 ea'],
+          cue: 'Side-lying, knees stacked and bent 90°, arms extended in front. Rotate the top arm open across your body, eyes follow the hand. Keep the knees pinned together. Move from the spine.' },
+        { id: 'M-t3', name: 'Wall Slides', equip: 'Wall',
+          reps: ['2×8','2×10','3×10','3×12'],
+          cue: 'Back, head, and arms against wall. Slide arms overhead keeping contact. If wrists come off, that\'s your end range — don\'t force it. Slow.' },
+      ]},
+      { title: 'LOWER LEG', duration: '2 min', exercises: [
+        { id: 'M-l1', name: 'Banded Ankle Dorsiflexion', equip: 'Light Band',
+          reps: ['2×8 ea','2×10 ea','3×10 ea','3×12 ea'],
+          cue: 'Loop band around forefoot, anchor behind you. Sit with leg extended. Pull foot toward shin against band resistance. Trains active dorsiflexion, not just passive stretch.' },
+      ]},
+      { title: 'GLUTE ACTIVATION', duration: '3 min', exercises: [
+        { id: 'M-a1', name: 'Clamshells', equip: 'Light Band',
+          reps: ['2×10 ea','2×12 ea','3×12 ea','3×15 ea'],
+          cue: 'Side-lying, band above knees, heels together. Open the top knee without rocking the pelvis back. Squeeze at the top. This is activation, not max effort — keep it crisp.' },
+        { id: 'M-a2', name: 'Glute Bridge — Slow Tempo', equip: 'Bodyweight or Band',
+          reps: ['2×8 (3 sec hold)','2×10 (3 sec hold)','3×10 (5 sec hold)','3×12 (5 sec hold)'],
+          cue: 'Drive through heels, lift hips. Squeeze at the top and hold. Lower slowly — count it out. Goal is glute activation, not load.' },
+      ]},
+      { title: 'COOL-DOWN', duration: '2 min', exercises: [
+        { id: 'M-d1', name: 'Supine Spinal Twist', equip: 'Mat',
+          reps: ['30 sec ea','45 sec ea','60 sec ea','60 sec ea'],
+          cue: 'On back, knees to chest, drop them to one side, opposite arm extended out. Look the opposite way. Breathe into the rib expansion.', noLog: true },
+        { id: 'M-d2', name: 'Diaphragmatic Breathing', equip: 'Mat',
+          reps: ['8 breaths','10 breaths','12 breaths','12 breaths'],
+          cue: 'On back, knees bent. One hand on chest, one on belly. Inhale 4 counts into the belly (chest hand stays still), exhale 6 counts. Down-regulates the nervous system.', noLog: true },
+      ]},
+    ],
+  },
 };
 
 // Progress tracker — key lifts to log weekly best set
@@ -332,6 +394,20 @@ const STORAGE = {
 
 // Mutable program — seeded from DEFAULT_DAYS, but user edits persist to localStorage
 let DAYS = STORAGE.loadProgram() || JSON.parse(JSON.stringify(DEFAULT_DAYS));
+
+// Migration: if stored program is missing any day defined in DEFAULT_DAYS, merge it in.
+// This preserves user edits to existing days while adding newly introduced ones (e.g. Day M).
+(function migrateDays() {
+  let migrated = false;
+  for (const k of Object.keys(DEFAULT_DAYS)) {
+    if (!DAYS[k]) {
+      DAYS[k] = JSON.parse(JSON.stringify(DEFAULT_DAYS[k]));
+      migrated = true;
+    }
+  }
+  if (migrated) STORAGE.saveProgram(DAYS);
+})();
+
 function saveProgramAndRerender() {
   STORAGE.saveProgram(DAYS);
   renderWorkout();
@@ -387,14 +463,18 @@ function renderWorkout() {
 
   const day = DAYS[STATE.selectedDay];
   const repIdx = getRepBlock(STATE.selectedWeek);
-  const sessionDate = getSessionDate(STATE.selectedDay, STATE.selectedWeek);
+  const hasWeekday = day.weekday !== null && day.weekday !== undefined;
+  const sessionDate = hasWeekday ? getSessionDate(STATE.selectedDay, STATE.selectedWeek) : null;
 
   // Header
   const header = document.createElement('div');
   header.className = 'day-header';
-  const todayBadge = isToday ? `<span style="color: var(--accent); font-size: 11px; letter-spacing: 0.18em; margin-left: 8px;">· TODAY</span>` : '';
+  const todayBadge = (hasWeekday && isToday) ? `<span style="color: var(--accent); font-size: 11px; letter-spacing: 0.18em; margin-left: 8px;">· TODAY</span>` : '';
+  const focusLine = hasWeekday
+    ? `${esc(day.weekdayLong.toUpperCase())} · ${esc(fmtDate(sessionDate).toUpperCase())}${todayBadge}`
+    : `${esc(day.weekdayLong.toUpperCase())} · WK ${STATE.selectedWeek} · PHASE ${getPhase(STATE.selectedWeek)}`;
   header.innerHTML = `
-    <div class="focus">${esc(day.weekdayLong.toUpperCase())} · ${esc(fmtDate(sessionDate).toUpperCase())}${todayBadge}</div>
+    <div class="focus">${focusLine}</div>
     <h1 class="display">${esc(day.title)}<span class="sub">${esc(day.sub)}</span></h1>
     <div class="session-meta">
       ${esc(day.duration)} · ${esc(day.equipment)}
