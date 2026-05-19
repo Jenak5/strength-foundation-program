@@ -2,8 +2,8 @@
 // STRENGTH FOUNDATION PROGRAM — APP LOGIC
 // ============================================================
 
-const PROGRAM_START = new Date(2026, 4, 7); // May 7, 2026 (Thu) — Wk 1 Day B
-const PROGRAM_END   = new Date(2026, 5, 30); // Jun 30, 2026 (Tue) — Wk 8 Day A
+const PROGRAM_START = new Date(2026, 4, 19); // May 19, 2026 (Tue) — Wk 1 Day A
+const PROGRAM_END   = new Date(2026, 6, 11); // Jul 11, 2026 (Sat) — Wk 8 Day C
 
 // ============================================================
 // EXERCISE DATA
@@ -267,11 +267,11 @@ function getNextWorkout(today = new Date()) {
 }
 
 function getSessionDate(dayKey, week) {
-  // Week 1 Day B = May 7. Week N Day X = ?
-  // Within week N: Day B is anchor (day 0), Day C is day 0+2, Day A is day 0+5
+  // Program week starts on Tuesday with Day A. Wk N Day A = PROGRAM_START + (N-1)*7 days.
+  // Within a week: Day A = day 0 (Tue), Day B = day 2 (Thu), Day C = day 4 (Sat)
   const anchor = new Date(PROGRAM_START);
   anchor.setDate(anchor.getDate() + (week - 1) * 7);
-  const offset = dayKey === 'B' ? 0 : dayKey === 'C' ? 2 : 5;
+  const offset = dayKey === 'A' ? 0 : dayKey === 'B' ? 2 : 4;
   const dt = new Date(anchor);
   dt.setDate(dt.getDate() + offset);
   return dt;
@@ -338,7 +338,7 @@ function renderWorkout() {
 
   // Pre-program
   if (STATE.selectedWeek === 0) {
-    v.innerHTML = `<div class="rest-day"><div class="rest-icon">⌃</div><h1 class="display">Program Starts Soon</h1><p>First session: Thu May 7, 2026 — Day B (Upper Body)</p></div>`;
+    v.innerHTML = `<div class="rest-day"><div class="rest-icon">⌃</div><h1 class="display">Program Starts Soon</h1><p>First session: Tue May 19, 2026 — Day A (Lower Body)</p></div>`;
     return;
   }
   if (STATE.selectedWeek === 9) {
