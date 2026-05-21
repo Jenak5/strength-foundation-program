@@ -282,6 +282,12 @@ const DEFAULT_DAYS = {
         { id: 'A-l5', name: 'Banded Glute Bridge', equip: 'Resistance Band',
           reps: ['2×12','3×15','3×15 + 3 sec hold','3×20 + 3 sec hold'],
           cue: 'Band above knees. Drive through heels. Squeeze glutes at top. Lower slowly — 3 count down.' },
+        { id: 'A-l6', name: 'Cable Hip Abduction', equip: 'ANCORE + ankle attachment',
+          reps: ['2×10 ea @ 5–10 lbs','3×12 ea @ 10–15 lbs','3×12 ea @ 15–20 lbs','3×15 ea @ 20–25 lbs'],
+          cue: 'Ankle strap on the working leg. Mount ANCORE low on the side opposite the working leg. Stand sideways, hand on the rack for balance. Lift the working leg out to the side — drive from the glute medius, not the hip flexor. Don\'t lean. Slow controlled return. Real glute med isolation that bands can\'t match at this load.' },
+        { id: 'A-l7', name: 'Cable Hip Kickback', equip: 'ANCORE + ankle attachment',
+          reps: ['2×10 ea @ 5–10 lbs','3×12 ea @ 10–15 lbs','3×12 ea @ 15–20 lbs','3×15 ea @ 20–25 lbs'],
+          cue: 'Ankle strap on the working leg. Mount ANCORE low, face the rack. Hold the rack for balance. Drive the working leg straight back, squeezing the glute hard at the top. Keep core braced — don\'t arch your low back to compensate. Slow controlled return. Direct glute max work.' },
       ]},
       { title: 'CORE', exercises: [
         { id: 'A-c1', name: 'Plank Hold', equip: 'Bodyweight',
@@ -325,15 +331,21 @@ const DEFAULT_DAYS = {
         { id: 'B-p1', name: 'TRX Row', equip: 'TRX',
           reps: ['2×8','3×10','3×12','3×15 + vest option'],
           cue: 'Walk feet forward = harder. Body straight. Pull elbows to ribs. Squeeze shoulder blades at top.' },
-        { id: 'B-p2', name: 'ANCORE Row', equip: 'ANCORE + plates',
+        { id: 'B-p2', name: 'ANCORE Row', equip: 'ANCORE + single handle',
           reps: ['2×10 @ 15–20 lbs','3×12 @ 25–30 lbs','3×12 @ 35–40 lbs','3×15 @ 45–50 lbs'],
           cue: 'Mount ANCORE at mid-rack height. Single handle. Hinge slightly at hips, brace core. Pull handle to belly button — elbow drives back, squeeze the shoulder blade. Control the return — 3 count out. Track actual load in your set log.' },
+        { id: 'B-p3', name: 'Face Pull', equip: 'ANCORE + tricep rope',
+          reps: ['2×12 @ 10–15 lbs','3×15 @ 15–20 lbs','3×15 @ 20–25 lbs','3×20 @ 25–30 lbs'],
+          cue: 'Tricep rope on ANCORE, mounted at upper-chest / face height. Grip both ends of the rope. Pull rope toward your face, separating your hands as you pull — finish with elbows high, hands by your ears, palms facing forward (external rotation). Lighter load, high reps. This one bulletproofs your shoulders against all the pressing work.' },
+        { id: 'B-p4', name: 'Straight Arm Pull-Down', equip: 'ANCORE + straight bar',
+          reps: ['2×10 @ 10–15 lbs','3×12 @ 15–20 lbs','3×12 @ 20–25 lbs','3×15 @ 25–30 lbs'],
+          cue: 'Straight bar on ANCORE, mounted high. Stand back from the rack, hinge slightly at the hips, arms straight overhead gripping the bar. Keep a SOFT bend at the elbow but lock it — no bicep curl. Drive the bar down in a wide arc to your thighs using only your lats and teres major. Squeeze hard at the bottom. Core braced throughout — this trains anti-extension too. Slow controlled return overhead.' },
       ]},
       { title: 'UPPER BODY — PUSH', exercises: [
         { id: 'B-u1', name: 'TRX Push-Up', equip: 'TRX',
           reps: ['2×6','2×8','3×8','3×10'],
           cue: 'Hands in TRX handles, feet on floor. More upright = easier. Lower slowly, push strong. Progress angle over time.' },
-        { id: 'B-u2', name: 'ANCORE Chest Press', equip: 'ANCORE + plates',
+        { id: 'B-u2', name: 'ANCORE Chest Press', equip: 'ANCORE + single handle',
           reps: ['2×10 @ 15–20 lbs','3×12 @ 25–30 lbs','3×12 @ 30–40 lbs','3×15 @ 40–50 lbs'],
           cue: 'Mount ANCORE at mid-rack height (about chest level when standing). Face away from the rack. Step forward until the cable is taut at the start. Press the handle forward, elbow tucks slightly. Control the return.' },
         { id: 'B-u3', name: 'KB Single Arm Press', equip: 'KB 32lb',
@@ -393,9 +405,9 @@ const DEFAULT_DAYS = {
         { id: 'C-u1', name: 'TRX Row', equip: 'TRX',
           reps: ['2×10','3×10','3×12','3×15'],
           cue: 'Same as Day B. Tracking progress? Walk feet forward an inch every 2 weeks.' },
-        { id: 'C-u2', name: 'ANCORE Pull-Down', equip: 'ANCORE + plates',
+        { id: 'C-u2', name: 'ANCORE Pull-Down', equip: 'ANCORE + straight bar',
           reps: ['2×10 @ 15–20 lbs','3×12 @ 25–30 lbs','3×12 @ 35–45 lbs','3×15 @ 45–55 lbs'],
-          cue: 'Mount ANCORE high on the rack. Single handle. Kneel facing the unit (or stand if you can keep the cable line). Pull handle down and slightly out to your ribs — lat focus, not biceps. Slow release. Don\'t shrug at the top of the return.' },
+          cue: 'Mount ANCORE high on the rack with the straight bar attachment (wider grip = more lats, less biceps). Kneel facing the unit. Pull the bar down to your upper chest — elbows drive down and out, lat focus. Slow release. Don\'t shrug at the top of the return.' },
       ]},
       { title: 'CONDITIONING', exercises: [
         { id: 'C-cond1', name: 'Ropeless Jump Rope Intervals', equip: 'Ropeless Jump Rope',
@@ -502,6 +514,12 @@ const PROGRESS_GROUPS = [
     { id: 'prog-ancore-row', name: 'ANCORE Row', goal: '3×15 @ 45–50 lbs', metric: 'reps @ lbs' },
     { id: 'prog-ancore-press', name: 'ANCORE Chest Press', goal: '3×15 @ 40–50 lbs', metric: 'reps @ lbs' },
     { id: 'prog-ancore-pull', name: 'ANCORE Pull-Down', goal: '3×15 @ 45–55 lbs', metric: 'reps @ lbs' },
+    { id: 'prog-face-pull', name: 'Face Pull', goal: '3×20 @ 25–30 lbs', metric: 'reps @ lbs' },
+    { id: 'prog-sa-pulldown', name: 'Straight Arm Pull-Down', goal: '3×15 @ 25–30 lbs', metric: 'reps @ lbs' },
+  ]},
+  { title: 'HIP & GLUTE ISOLATION', items: [
+    { id: 'prog-hip-abd', name: 'Cable Hip Abduction', goal: '3×15 ea @ 20–25 lbs', metric: 'reps @ lbs' },
+    { id: 'prog-hip-kick', name: 'Cable Hip Kickback', goal: '3×15 ea @ 20–25 lbs', metric: 'reps @ lbs' },
   ]},
   { title: 'CORE', items: [
     { id: 'prog-plank', name: 'Plank Hold', goal: '3×40 sec', metric: 'seconds' },
@@ -731,6 +749,89 @@ let DAYS = STORAGE.loadProgram() || JSON.parse(JSON.stringify(DEFAULT_DAYS));
 
   if (changed) STORAGE.saveProgram(DAYS);
   localStorage.setItem('migration:ancore-v1', '1');
+})();
+
+// Migration v2: Add attachment-based functional exercises (Face Pull, Straight Arm
+// Pull-Down, Cable Hip Abduction, Cable Hip Kickback) to existing stored programs.
+// Also update ANCORE equip strings to specify attachments (single handle / straight bar).
+// Field-by-field check preserves user edits.
+(function migrateAncoreAttachments() {
+  if (localStorage.getItem('migration:ancore-attachments')) return;
+
+  const findExWithSection = (exId) => {
+    for (const dayKey of Object.keys(DAYS)) {
+      for (const section of (DAYS[dayKey].sections || [])) {
+        const idx = section.exercises.findIndex(e => e.id === exId);
+        if (idx !== -1) return { section, idx };
+      }
+    }
+    return null;
+  };
+  const findSection = (dayKey, sectionTitle) => {
+    const d = DAYS[dayKey];
+    if (!d) return null;
+    return (d.sections || []).find(s => s.title === sectionTitle) || null;
+  };
+  const exExists = (exId) => !!findExWithSection(exId);
+
+  let changed = false;
+
+  // Update equip strings on already-migrated ANCORE exercises (v1 defaulted them to "ANCORE + plates")
+  const equipUpdates = [
+    { id: 'B-p2', from: 'ANCORE + plates', to: 'ANCORE + single handle' },
+    { id: 'B-u2', from: 'ANCORE + plates', to: 'ANCORE + single handle' },
+    { id: 'C-u2', from: 'ANCORE + plates', to: 'ANCORE + straight bar' },
+  ];
+  for (const u of equipUpdates) {
+    const f = findExWithSection(u.id);
+    if (f && f.section.exercises[f.idx].equip === u.from) {
+      f.section.exercises[f.idx].equip = u.to;
+      changed = true;
+    }
+  }
+
+  // Update Pull-Down cue from v1 default to mention straight bar (only if still default)
+  const pulldownV1Cue = 'Mount ANCORE high on the rack. Single handle. Kneel facing the unit (or stand if you can keep the cable line). Pull handle down and slightly out to your ribs — lat focus, not biceps. Slow release. Don\'t shrug at the top of the return.';
+  const f = findExWithSection('C-u2');
+  if (f && f.section.exercises[f.idx].cue === pulldownV1Cue) {
+    f.section.exercises[f.idx].cue = 'Mount ANCORE high on the rack with the straight bar attachment (wider grip = more lats, less biceps). Kneel facing the unit. Pull the bar down to your upper chest — elbows drive down and out, lat focus. Slow release. Don\'t shrug at the top of the return.';
+    changed = true;
+  }
+
+  // New exercises to add if missing (matched by ID).
+  const newExercises = [
+    { dayKey: 'A', sectionTitle: 'LOWER BODY', ex: {
+      id: 'A-l6', name: 'Cable Hip Abduction', equip: 'ANCORE + ankle attachment',
+      reps: ['2×10 ea @ 5–10 lbs','3×12 ea @ 10–15 lbs','3×12 ea @ 15–20 lbs','3×15 ea @ 20–25 lbs'],
+      cue: 'Ankle strap on the working leg. Mount ANCORE low on the side opposite the working leg. Stand sideways, hand on the rack for balance. Lift the working leg out to the side — drive from the glute medius, not the hip flexor. Don\'t lean. Slow controlled return. Real glute med isolation that bands can\'t match at this load.'
+    }},
+    { dayKey: 'A', sectionTitle: 'LOWER BODY', ex: {
+      id: 'A-l7', name: 'Cable Hip Kickback', equip: 'ANCORE + ankle attachment',
+      reps: ['2×10 ea @ 5–10 lbs','3×12 ea @ 10–15 lbs','3×12 ea @ 15–20 lbs','3×15 ea @ 20–25 lbs'],
+      cue: 'Ankle strap on the working leg. Mount ANCORE low, face the rack. Hold the rack for balance. Drive the working leg straight back, squeezing the glute hard at the top. Keep core braced — don\'t arch your low back to compensate. Slow controlled return. Direct glute max work.'
+    }},
+    { dayKey: 'B', sectionTitle: 'UPPER BODY — PULL', ex: {
+      id: 'B-p3', name: 'Face Pull', equip: 'ANCORE + tricep rope',
+      reps: ['2×12 @ 10–15 lbs','3×15 @ 15–20 lbs','3×15 @ 20–25 lbs','3×20 @ 25–30 lbs'],
+      cue: 'Tricep rope on ANCORE, mounted at upper-chest / face height. Grip both ends of the rope. Pull rope toward your face, separating your hands as you pull — finish with elbows high, hands by your ears, palms facing forward (external rotation). Lighter load, high reps. This one bulletproofs your shoulders against all the pressing work.'
+    }},
+    { dayKey: 'B', sectionTitle: 'UPPER BODY — PULL', ex: {
+      id: 'B-p4', name: 'Straight Arm Pull-Down', equip: 'ANCORE + straight bar',
+      reps: ['2×10 @ 10–15 lbs','3×12 @ 15–20 lbs','3×12 @ 20–25 lbs','3×15 @ 25–30 lbs'],
+      cue: 'Straight bar on ANCORE, mounted high. Stand back from the rack, hinge slightly at the hips, arms straight overhead gripping the bar. Keep a SOFT bend at the elbow but lock it — no bicep curl. Drive the bar down in a wide arc to your thighs using only your lats and teres major. Squeeze hard at the bottom. Core braced throughout — this trains anti-extension too. Slow controlled return overhead.'
+    }},
+  ];
+
+  for (const item of newExercises) {
+    if (exExists(item.ex.id)) continue;
+    const section = findSection(item.dayKey, item.sectionTitle);
+    if (!section) continue;
+    section.exercises.push(item.ex);
+    changed = true;
+  }
+
+  if (changed) STORAGE.saveProgram(DAYS);
+  localStorage.setItem('migration:ancore-attachments', '1');
 })();
 
 function saveProgramAndRerender() {
