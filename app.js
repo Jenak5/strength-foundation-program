@@ -77,7 +77,7 @@ const DEFAULT_DAYS = {
     weekdayShort: 'Thu',
     weekdayLong: 'Thursday',
     duration: '~35 min',
-    equipment: 'TRX · Anchor Pulley + Bands · KB 32lb · Jump Rope',
+    equipment: 'TRX · ANCORE (1 unit, up to 55 lbs) · KB 32lb · Jump Rope',
     injection: true,
     notes: 'Stay extra hydrated today.',
     sections: [
@@ -90,17 +90,17 @@ const DEFAULT_DAYS = {
         { id: 'B-p1', name: 'TRX Row', equip: 'TRX',
           reps: ['2×8','3×10','3×12','3×15 + vest option'],
           cue: 'Walk feet forward = harder. Body straight. Pull elbows to ribs. Squeeze shoulder blades at top.' },
-        { id: 'B-p2', name: 'Anchor Pulley Row', equip: 'Bands + Pulley',
-          reps: ['2×10','3×12','3×12 heavier band','3×15 heavier band'],
-          cue: 'Hinge slightly at hips. Pull band to belly button. Controlled release — 3 count out.' },
+        { id: 'B-p2', name: 'ANCORE Row', equip: 'ANCORE + plates',
+          reps: ['2×10 @ 15–20 lbs','3×12 @ 25–30 lbs','3×12 @ 35–40 lbs','3×15 @ 45–50 lbs'],
+          cue: 'Mount ANCORE at mid-rack height. Single handle. Hinge slightly at hips, brace core. Pull handle to belly button — elbow drives back, squeeze the shoulder blade. Control the return — 3 count out. Track actual load in your set log.' },
       ]},
       { title: 'UPPER BODY — PUSH', exercises: [
         { id: 'B-u1', name: 'TRX Push-Up', equip: 'TRX',
           reps: ['2×6','2×8','3×8','3×10'],
           cue: 'Hands in TRX handles, feet on floor. More upright = easier. Lower slowly, push strong. Progress angle over time.' },
-        { id: 'B-u2', name: 'Anchor Pulley Chest Press', equip: 'Bands + Pulley',
-          reps: ['2×10','3×12','3×12 heavier band','3×15 heavier band'],
-          cue: 'Anchor at chest height. Press forward and slightly down. Control the return.' },
+        { id: 'B-u2', name: 'ANCORE Chest Press', equip: 'ANCORE + plates',
+          reps: ['2×10 @ 15–20 lbs','3×12 @ 25–30 lbs','3×12 @ 30–40 lbs','3×15 @ 40–50 lbs'],
+          cue: 'Mount ANCORE at mid-rack height (about chest level when standing). Face away from the rack. Step forward until the cable is taut at the start. Press the handle forward, elbow tucks slightly. Control the return.' },
         { id: 'B-u3', name: 'KB Single Arm Press', equip: 'KB 32lb',
           reps: ['2×6 ea','2×8 ea','3×8 ea','3×10 ea'],
           cue: 'Clean KB to shoulder first. Press straight up — don\'t lean away. Lower slowly. Brace your core throughout.' },
@@ -131,7 +131,7 @@ const DEFAULT_DAYS = {
     weekdayShort: 'Sat',
     weekdayLong: 'Saturday',
     duration: '~35 min',
-    equipment: 'KB 32lb · TRX · Bands · Stepper · Jump Rope · Slam Ball · Vest (Wk 5+)',
+    equipment: 'KB 32lb · TRX · ANCORE · Bands · Stepper · Jump Rope · Slam Ball · Vest (Wk 5+)',
     injection: false,
     notes: 'Day after injection.',
     sections: [
@@ -158,9 +158,9 @@ const DEFAULT_DAYS = {
         { id: 'C-u1', name: 'TRX Row', equip: 'TRX',
           reps: ['2×10','3×10','3×12','3×15'],
           cue: 'Same as Day B. Tracking progress? Walk feet forward an inch every 2 weeks.' },
-        { id: 'C-u2', name: 'Anchor Pulley Pull-Down', equip: 'Bands + Pulley',
-          reps: ['2×10','3×12','3×12 heavier band','3×15 heavier band'],
-          cue: 'Anchor high. Kneel or stand. Pull elbows down to ribs. Lat focus. Slow release.' },
+        { id: 'C-u2', name: 'ANCORE Pull-Down', equip: 'ANCORE + plates',
+          reps: ['2×10 @ 15–20 lbs','3×12 @ 25–30 lbs','3×12 @ 35–45 lbs','3×15 @ 45–55 lbs'],
+          cue: 'Mount ANCORE high on the rack. Single handle. Kneel facing the unit (or stand if you can keep the cable line). Pull handle down and slightly out to your ribs — lat focus, not biceps. Slow release. Don\'t shrug at the top of the return.' },
       ]},
       { title: 'CONDITIONING', exercises: [
         { id: 'C-cond1', name: 'Ropeless Jump Rope Intervals', equip: 'Ropeless Jump Rope',
@@ -264,6 +264,9 @@ const PROGRESS_GROUPS = [
     { id: 'prog-trxrow', name: 'TRX Row', goal: '3×15 horizontal', metric: 'reps / angle' },
     { id: 'prog-trxpush', name: 'TRX Push-Up', goal: '3×10', metric: 'reps' },
     { id: 'prog-press', name: 'KB Single Arm Press', goal: '3×10 ea side', metric: 'reps ea' },
+    { id: 'prog-ancore-row', name: 'ANCORE Row', goal: '3×15 @ 45–50 lbs', metric: 'reps @ lbs' },
+    { id: 'prog-ancore-press', name: 'ANCORE Chest Press', goal: '3×15 @ 40–50 lbs', metric: 'reps @ lbs' },
+    { id: 'prog-ancore-pull', name: 'ANCORE Pull-Down', goal: '3×15 @ 45–55 lbs', metric: 'reps @ lbs' },
   ]},
   { title: 'CORE', items: [
     { id: 'prog-plank', name: 'Plank Hold', goal: '3×40 sec', metric: 'seconds' },
@@ -406,6 +409,93 @@ let DAYS = STORAGE.loadProgram() || JSON.parse(JSON.stringify(DEFAULT_DAYS));
     }
   }
   if (migrated) STORAGE.saveProgram(DAYS);
+})();
+
+// Migration: ANCORE rebrand. Update old "Anchor Pulley" generic-band cues to real ANCORE
+// cues + plate-based rep prescriptions. Field-by-field: only replace values that still
+// match the prior defaults (so user edits are preserved).
+(function migrateAncoreV1() {
+  if (localStorage.getItem('migration:ancore-v1')) return;
+
+  const findEx = (exId) => {
+    for (const dayKey of Object.keys(DAYS)) {
+      for (const section of (DAYS[dayKey].sections || [])) {
+        const ex = section.exercises.find(e => e.id === exId);
+        if (ex) return ex;
+      }
+    }
+    return null;
+  };
+
+  const updates = [
+    { id: 'B-p2',
+      oldDefaults: {
+        name: 'Anchor Pulley Row',
+        equip: 'Bands + Pulley',
+        reps: ['2×10','3×12','3×12 heavier band','3×15 heavier band'],
+        cue: 'Hinge slightly at hips. Pull band to belly button. Controlled release — 3 count out.'
+      },
+      newValues: {
+        name: 'ANCORE Row',
+        equip: 'ANCORE + plates',
+        reps: ['2×10 @ 15–20 lbs','3×12 @ 25–30 lbs','3×12 @ 35–40 lbs','3×15 @ 45–50 lbs'],
+        cue: 'Mount ANCORE at mid-rack height. Single handle. Hinge slightly at hips, brace core. Pull handle to belly button — elbow drives back, squeeze the shoulder blade. Control the return — 3 count out. Track actual load in your set log.'
+      }
+    },
+    { id: 'B-u2',
+      oldDefaults: {
+        name: 'Anchor Pulley Chest Press',
+        equip: 'Bands + Pulley',
+        reps: ['2×10','3×12','3×12 heavier band','3×15 heavier band'],
+        cue: 'Anchor at chest height. Press forward and slightly down. Control the return.'
+      },
+      newValues: {
+        name: 'ANCORE Chest Press',
+        equip: 'ANCORE + plates',
+        reps: ['2×10 @ 15–20 lbs','3×12 @ 25–30 lbs','3×12 @ 30–40 lbs','3×15 @ 40–50 lbs'],
+        cue: 'Mount ANCORE at mid-rack height (about chest level when standing). Face away from the rack. Step forward until the cable is taut at the start. Press the handle forward, elbow tucks slightly. Control the return.'
+      }
+    },
+    { id: 'C-u2',
+      oldDefaults: {
+        name: 'Anchor Pulley Pull-Down',
+        equip: 'Bands + Pulley',
+        reps: ['2×10','3×12','3×12 heavier band','3×15 heavier band'],
+        cue: 'Anchor high. Kneel or stand. Pull elbows down to ribs. Lat focus. Slow release.'
+      },
+      newValues: {
+        name: 'ANCORE Pull-Down',
+        equip: 'ANCORE + plates',
+        reps: ['2×10 @ 15–20 lbs','3×12 @ 25–30 lbs','3×12 @ 35–45 lbs','3×15 @ 45–55 lbs'],
+        cue: 'Mount ANCORE high on the rack. Single handle. Kneel facing the unit (or stand if you can keep the cable line). Pull handle down and slightly out to your ribs — lat focus, not biceps. Slow release. Don\'t shrug at the top of the return.'
+      }
+    },
+  ];
+
+  let changed = false;
+  for (const u of updates) {
+    const ex = findEx(u.id);
+    if (!ex) continue;
+    for (const field of Object.keys(u.oldDefaults)) {
+      if (JSON.stringify(ex[field]) === JSON.stringify(u.oldDefaults[field])) {
+        ex[field] = u.newValues[field];
+        changed = true;
+      }
+    }
+  }
+
+  // Also migrate Day B + Day C equipment strings if still on the old defaults
+  if (DAYS.B && DAYS.B.equipment === 'TRX · Anchor Pulley + Bands · KB 32lb · Jump Rope') {
+    DAYS.B.equipment = 'TRX · ANCORE (1 unit, up to 55 lbs) · KB 32lb · Jump Rope';
+    changed = true;
+  }
+  if (DAYS.C && DAYS.C.equipment === 'KB 32lb · TRX · Bands · Stepper · Jump Rope · Slam Ball · Vest (Wk 5+)') {
+    DAYS.C.equipment = 'KB 32lb · TRX · ANCORE · Bands · Stepper · Jump Rope · Slam Ball · Vest (Wk 5+)';
+    changed = true;
+  }
+
+  if (changed) STORAGE.saveProgram(DAYS);
+  localStorage.setItem('migration:ancore-v1', '1');
 })();
 
 function saveProgramAndRerender() {
@@ -762,8 +852,8 @@ function renderInfo() {
         <h2>Equipment</h2>
         <div class="info-item row"><div class="ii-label">Kettlebell</div><div class="ii-body">32 lbs — primary strength tool</div></div>
         <div class="info-item row"><div class="ii-label">TRX</div><div class="ii-body">Suspension trainer — rows, push-ups, squats, core</div></div>
-        <div class="info-item row"><div class="ii-label">Anchor + Bands</div><div class="ii-body">Rows, chest press, pull-downs, rotations</div></div>
-        <div class="info-item row"><div class="ii-label">Bands</div><div class="ii-body">Glute work, warm-up, assistance</div></div>
+        <div class="info-item row"><div class="ii-label">ANCORE</div><div class="ii-body">Portable cable trainer (1 unit, up to 55 lbs). True 1:1 resistance via plates in 2.5/5/10 lb increments. Mounts to your squat rack — slide up/down for angle changes.</div></div>
+        <div class="info-item row"><div class="ii-label">Bands</div><div class="ii-body">Glute work, warm-up, assistance, Day C banded squats</div></div>
         <div class="info-item row"><div class="ii-label">Slam Ball</div><div class="ii-body">TRX slam ball — slams, twists, weighted core work</div></div>
         <div class="info-item row"><div class="ii-label">Weighted Vests</div><div class="ii-body">Progressive overload — added in Weeks 5–8</div></div>
         <div class="info-item row"><div class="ii-label">Stair Stepper</div><div class="ii-body">Mini stepper — warm-up + active rest</div></div>
@@ -780,6 +870,7 @@ function renderInfo() {
         <h2>Progression Rules</h2>
         <div class="info-item"><div class="ii-label">Rep Goal System</div><div class="ii-body">When you hit the TOP of the rep range for ALL sets → increase difficulty next session.</div></div>
         <div class="info-item"><div class="ii-label">KB Progression</div><div class="ii-body">More reps → more sets → add weighted vest → faster tempo.</div></div>
+        <div class="info-item"><div class="ii-label">ANCORE Progression</div><div class="ii-body">Add resistance plates in 2.5 / 5 / 10 lb increments — exactly like a barbell. When you hit the top of the rep range across all sets, add one plate next session. Log actual weight in your set notes.</div></div>
         <div class="info-item"><div class="ii-label">Band Progression</div><div class="ii-body">Increase band resistance or shorten anchor point for more tension.</div></div>
         <div class="info-item"><div class="ii-label">TRX Progression</div><div class="ii-body">Adjust body angle — more horizontal = harder.</div></div>
         <div class="info-item"><div class="ii-label">If It Feels Easy</div><div class="ii-body">Good. Add 1 rep per set next session. Slow and steady.</div></div>
