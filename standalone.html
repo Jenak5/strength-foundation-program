@@ -273,6 +273,12 @@ const DEFAULT_DAYS = {
         { id: 'A-l2', name: 'KB Romanian Deadlift', equip: 'KB 32lb',
           reps: ['2×8','3×10','3×10 + light vest','3×12 + vest'],
           cue: 'Hinge at hips, soft knee bend. KB tracks down your shins. Feel the hamstring stretch. Drive hips forward to stand.' },
+        { id: 'A-l8', name: 'Bulgarian Split Squat', equip: 'KB 32lb + bench',
+          reps: ['2×8 ea bodyweight','3×8 ea @ KB 32lb','3×10 ea + light vest','3×12 ea + vest'],
+          cue: 'Rear foot elevated on a bench/chair behind you. Front foot far enough forward that your knee tracks over toes — not past. KB held goblet at chest (or one in each hand). Lower straight down — back knee toward floor, not back. Drive through the front heel. ~80% of load lives on the front leg. Boyle gospel.' },
+        { id: 'A-l9', name: 'Single Leg KB RDL', equip: 'KB 32lb',
+          reps: ['2×8 ea @ KB 32lb','3×8 ea','3×10 ea + light vest','3×12 ea + vest'],
+          cue: 'KB in the OPPOSITE hand from the working leg (better counterbalance). Soft bend in the working knee — don\'t lock it. Hinge at the hip, free leg extends straight back, body forms a T shape parallel to floor. KB tracks down close to the working leg. Squeeze the working glute to return. Balance is the point — go slow, set the foot down between reps if needed.' },
         { id: 'A-l3', name: 'TRX Assisted Squat', equip: 'TRX',
           reps: ['2×10','3×10','3×12','3×15'],
           cue: 'Hold TRX handles for balance assist. Use as little help as possible. Works depth and confidence.' },
@@ -424,6 +430,12 @@ const DEFAULT_DAYS = {
         { id: 'C-c3', name: 'Side Plank', equip: 'Bodyweight',
           reps: ['2×15 sec ea','2×20 sec ea','3×25 sec ea','3×30 sec ea'],
           cue: 'Forearm on ground. Body straight. Don\'t let hips sag. Breathe. Progress time each week.' },
+        { id: 'C-c4', name: 'Pallof Press', equip: 'ANCORE + single handle',
+          reps: ['2×10 ea @ 15–20 lbs','3×12 ea @ 20–25 lbs','3×12 ea @ 25–30 lbs','3×15 ea @ 30–35 lbs'],
+          cue: 'Mount ANCORE at chest height. Stand perpendicular to the rack with the handle pressed into your chest with both hands. Brace core hard. Press the handle straight out in front of you — the cable will try to rotate you toward the rack. RESIST. Hold 2–3 sec at full extension. Slow return. Anti-rotation core — Cressey signature. Counts are per side.' },
+        { id: 'C-c5', name: 'Suitcase Carry', equip: 'KB 32lb',
+          reps: ['2×20 sec ea side','2×30 sec ea side','3×30 sec ea side','3×40 sec ea side'],
+          cue: 'Hold the KB in one hand at your side like a heavy suitcase. Stand tall — DO NOT lean to the opposite side. Walk slowly, keep torso completely vertical. Counter the load with your obliques and QL on the opposite side. If you\'re leaning, the weight is too heavy. Switch sides.' },
       ]},
       { title: 'COOL-DOWN', duration: '3 min', exercises: [
         { id: 'C-d1', name: 'Figure-4 Glute Stretch', equip: 'Floor',
@@ -504,6 +516,8 @@ const PROGRESS_GROUPS = [
   { title: 'LOWER BODY', items: [
     { id: 'prog-goblet', name: 'Goblet Squat', goal: '3×12 + vest', metric: 'reps @ 32lb' },
     { id: 'prog-rdl', name: 'KB RDL', goal: '3×12 + vest', metric: 'reps @ 32lb' },
+    { id: 'prog-bss', name: 'Bulgarian Split Squat', goal: '3×12 ea + vest', metric: 'reps ea' },
+    { id: 'prog-sl-rdl', name: 'Single Leg KB RDL', goal: '3×12 ea + vest', metric: 'reps ea' },
     { id: 'prog-sumo', name: 'KB Sumo Deadlift', goal: '3×12 + vest', metric: 'reps' },
     { id: 'prog-swing', name: 'KB Swing', goal: '3×15 + vest', metric: 'reps' },
   ]},
@@ -525,6 +539,8 @@ const PROGRESS_GROUPS = [
     { id: 'prog-plank', name: 'Plank Hold', goal: '3×40 sec', metric: 'seconds' },
     { id: 'prog-sideplank', name: 'Side Plank', goal: '3×30 sec ea', metric: 'seconds each' },
     { id: 'prog-situp', name: 'Straight Leg Sit-Up', goal: '3×12', metric: 'reps' },
+    { id: 'prog-pallof', name: 'Pallof Press', goal: '3×15 ea @ 30–35 lbs', metric: 'reps @ lbs' },
+    { id: 'prog-suitcase', name: 'Suitcase Carry', goal: '3×40 sec ea side', metric: 'seconds each' },
   ]},
   { title: 'POWER + CONDITIONING', items: [
     { id: 'prog-slam', name: 'Med Ball Slam', goal: '3×15', metric: 'reps' },
@@ -832,6 +848,63 @@ let DAYS = STORAGE.loadProgram() || JSON.parse(JSON.stringify(DEFAULT_DAYS));
 
   if (changed) STORAGE.saveProgram(DAYS);
   localStorage.setItem('migration:ancore-attachments', '1');
+})();
+
+// Migration v3: Add functional staples per Boyle/Cressey/Sims philosophy.
+// Bulgarian Split Squat, Single Leg KB RDL (Day A), Pallof Press, Suitcase Carry (Day C).
+// Idempotent — only adds if exercise ID not already present.
+(function migrateFunctionalStaples() {
+  if (localStorage.getItem('migration:functional-staples')) return;
+
+  const findExWithSection = (exId) => {
+    for (const dayKey of Object.keys(DAYS)) {
+      for (const section of (DAYS[dayKey].sections || [])) {
+        const idx = section.exercises.findIndex(e => e.id === exId);
+        if (idx !== -1) return { section, idx };
+      }
+    }
+    return null;
+  };
+  const findSection = (dayKey, sectionTitle) => {
+    const d = DAYS[dayKey];
+    if (!d) return null;
+    return (d.sections || []).find(s => s.title === sectionTitle) || null;
+  };
+
+  const newExercises = [
+    { dayKey: 'A', sectionTitle: 'LOWER BODY', ex: {
+      id: 'A-l8', name: 'Bulgarian Split Squat', equip: 'KB 32lb + bench',
+      reps: ['2×8 ea bodyweight','3×8 ea @ KB 32lb','3×10 ea + light vest','3×12 ea + vest'],
+      cue: 'Rear foot elevated on a bench/chair behind you. Front foot far enough forward that your knee tracks over toes — not past. KB held goblet at chest (or one in each hand). Lower straight down — back knee toward floor, not back. Drive through the front heel. ~80% of load lives on the front leg. Boyle gospel.'
+    }},
+    { dayKey: 'A', sectionTitle: 'LOWER BODY', ex: {
+      id: 'A-l9', name: 'Single Leg KB RDL', equip: 'KB 32lb',
+      reps: ['2×8 ea @ KB 32lb','3×8 ea','3×10 ea + light vest','3×12 ea + vest'],
+      cue: 'KB in the OPPOSITE hand from the working leg (better counterbalance). Soft bend in the working knee — don\'t lock it. Hinge at the hip, free leg extends straight back, body forms a T shape parallel to floor. KB tracks down close to the working leg. Squeeze the working glute to return. Balance is the point — go slow, set the foot down between reps if needed.'
+    }},
+    { dayKey: 'C', sectionTitle: 'CORE', ex: {
+      id: 'C-c4', name: 'Pallof Press', equip: 'ANCORE + single handle',
+      reps: ['2×10 ea @ 15–20 lbs','3×12 ea @ 20–25 lbs','3×12 ea @ 25–30 lbs','3×15 ea @ 30–35 lbs'],
+      cue: 'Mount ANCORE at chest height. Stand perpendicular to the rack with the handle pressed into your chest with both hands. Brace core hard. Press the handle straight out in front of you — the cable will try to rotate you toward the rack. RESIST. Hold 2–3 sec at full extension. Slow return. Anti-rotation core — Cressey signature. Counts are per side.'
+    }},
+    { dayKey: 'C', sectionTitle: 'CORE', ex: {
+      id: 'C-c5', name: 'Suitcase Carry', equip: 'KB 32lb',
+      reps: ['2×20 sec ea side','2×30 sec ea side','3×30 sec ea side','3×40 sec ea side'],
+      cue: 'Hold the KB in one hand at your side like a heavy suitcase. Stand tall — DO NOT lean to the opposite side. Walk slowly, keep torso completely vertical. Counter the load with your obliques and QL on the opposite side. If you\'re leaning, the weight is too heavy. Switch sides.'
+    }},
+  ];
+
+  let changed = false;
+  for (const item of newExercises) {
+    if (findExWithSection(item.ex.id)) continue;
+    const section = findSection(item.dayKey, item.sectionTitle);
+    if (!section) continue;
+    section.exercises.push(item.ex);
+    changed = true;
+  }
+
+  if (changed) STORAGE.saveProgram(DAYS);
+  localStorage.setItem('migration:functional-staples', '1');
 })();
 
 function saveProgramAndRerender() {
