@@ -22,14 +22,22 @@ const DEFAULT_DAYS = {
     weekday: 2, // Tuesday
     weekdayShort: 'Tue',
     weekdayLong: 'Tuesday',
-    duration: '~30 min',
-    equipment: 'KB 32lb · Bench · Band · ANCORE · Stepper · Vest (Wk 5+)',
+    duration: '~35 min',
+    equipment: 'KB 32lb · Bench · Band · ANCORE · Stepper · Mat · Vest (Wk 5+)',
     injection: false,
     sections: [
       { title: 'WARM-UP', duration: '5 min', exercises: [
         { id: 'A-w1', name: 'Stair Stepper', equip: 'Mini Stair Stepper',
           reps: ['5 min · Easy pace','5 min · Moderate','5 min · Moderate-fast','5 min · Fast pace'],
           cue: 'Just get warm — not a workout yet. Light effort.', noLog: true },
+      ]},
+      { title: 'MOBILITY PREP', duration: '3 min', exercises: [
+        { id: 'A-mp1', name: 'World\'s Greatest Stretch', equip: 'Mat',
+          reps: ['2×5 ea','2×6 ea','3×6 ea','3×8 ea'],
+          cue: 'Step into a deep lunge, back knee hovering. Drop the same-side hand to the floor inside the front foot. Reach the other arm up and rotate the chest open toward the ceiling. Lower hand, switch reach, then step back to push-up position and switch sides. Hits hip flexors, hamstrings, T-spine in one shot — primes everything below.', noLog: true },
+        { id: 'A-mp2', name: '90/90 Hip Roll', equip: 'Mat',
+          reps: ['2×6 ea','2×8 ea','3×8 ea','3×10 ea'],
+          cue: 'Seated, one leg in front at 90°, other to the side at 90°. Sit tall — hands off the floor. Drive the back knee down to the floor and rotate the hips to switch sides. Slow and controlled. Wakes up hip internal and external rotation before squatting.', noLog: true },
       ]},
       { title: 'LOWER BODY', exercises: [
         { id: 'A-l1', name: 'Goblet Squat', equip: 'KB 32lb',
@@ -44,9 +52,9 @@ const DEFAULT_DAYS = {
         { id: 'A-l5', name: 'Banded Glute Bridge', equip: 'Resistance Band',
           reps: ['2×12','3×15','3×15 + 3 sec hold','3×20 + 3 sec hold'],
           cue: 'Band above knees. Drive through heels. Squeeze glutes at top. Lower slowly — 3 count down.' },
-        { id: 'A-l6', name: 'Cable Hip Abduction', equip: 'ANCORE + ankle attachment',
-          reps: ['2×10 ea @ 5–10 lbs','3×12 ea @ 10–15 lbs','3×12 ea @ 15–20 lbs','3×15 ea @ 20–25 lbs'],
-          cue: 'Ankle strap on the working leg. Mount ANCORE low on the side opposite the working leg. Stand sideways, hand on the rack for balance. Lift the working leg out to the side — drive from the glute medius, not the hip flexor. Don\'t lean. Slow controlled return. Real glute med isolation that bands can\'t match at this load.' },
+        { id: 'A-l10', name: 'Lateral Lunge', equip: 'KB 32lb',
+          reps: ['2×6 ea bodyweight','3×8 ea bodyweight','3×8 ea @ KB 32lb','3×10 ea @ KB + light vest'],
+          cue: 'Hold KB at chest (goblet). Stand tall, feet together. Step wide to one side and sit back into that hip — load the working leg, keep the opposite leg straight with toes pointing forward. Chest tall, weight in mid-foot/heel of working leg. Drive through the working heel to return to center. Trains the frontal plane and adductors that bands and machines miss. Boyle-style functional glute med work.' },
       ]},
       { title: 'CORE', exercises: [
         { id: 'A-c1', name: 'Plank Hold', equip: 'Bodyweight',
@@ -76,8 +84,8 @@ const DEFAULT_DAYS = {
     weekday: 4, // Thursday
     weekdayShort: 'Thu',
     weekdayLong: 'Thursday',
-    duration: '~30 min',
-    equipment: 'TRX · ANCORE (single handle, tricep rope, straight bar) · Jump Rope',
+    duration: '~33 min',
+    equipment: 'TRX · ANCORE (single handle, tricep rope, straight bar) · Jump Rope · Mat / Wall',
     injection: true,
     notes: 'Stay extra hydrated today.',
     sections: [
@@ -85,6 +93,14 @@ const DEFAULT_DAYS = {
         { id: 'B-w1', name: 'Ropeless Jump Rope', equip: 'Ropeless Jump Rope',
           reps: ['3 min · Easy','3 min · Moderate','3 min · Moderate','3 min · Fast intervals'],
           cue: 'Light wrist motion. Get blood moving — not cardio. Stop if dizzy or HR spikes.', noLog: true },
+      ]},
+      { title: 'MOBILITY PREP', duration: '3 min', exercises: [
+        { id: 'B-mp1', name: 'Wall Slides', equip: 'Wall',
+          reps: ['2×8','2×10','3×10','3×12'],
+          cue: 'Back, head, and arms against wall. Slide arms overhead keeping wrists and elbows in contact with the wall. If wrists come off, that\'s your end range — don\'t force it. Trains scap upward rotation and overhead position before any pulling or pressing.', noLog: true },
+        { id: 'B-mp2', name: 'Open Book', equip: 'Mat',
+          reps: ['2×6 ea','2×8 ea','3×8 ea','3×10 ea'],
+          cue: 'Side-lying, knees stacked and bent 90° (top knee anchored), arms extended in front. Rotate the top arm open across your body, eyes follow the hand. Keep the knees pinned together — rotation comes from the spine, not the hips. Critical T-spine prep for rowing and pressing.', noLog: true },
       ]},
       { title: 'UPPER BODY — PULL', exercises: [
         { id: 'B-p1', name: 'TRX Row', equip: 'TRX',
@@ -130,8 +146,8 @@ const DEFAULT_DAYS = {
     weekday: 6, // Saturday
     weekdayShort: 'Sat',
     weekdayLong: 'Saturday',
-    duration: '~35 min',
-    equipment: 'KB 32lb · ANCORE · Stepper · Jump Rope · Slam Ball · Vest (Wk 5+)',
+    duration: '~38 min',
+    equipment: 'KB 32lb · ANCORE · Stepper · Jump Rope · Slam Ball · Mat · Vest (Wk 5+)',
     injection: false,
     notes: 'Day after injection.',
     sections: [
@@ -139,6 +155,14 @@ const DEFAULT_DAYS = {
         { id: 'C-w1', name: 'Stair Stepper or Jump Rope', equip: 'Stepper / Rope',
           reps: ['5 min · Easy','5 min · Moderate','5 min · Moderate','5 min · Push pace'],
           cue: 'Your choice — whatever feels better that day. Goal is warm, not tired.', noLog: true },
+      ]},
+      { title: 'MOBILITY PREP', duration: '3 min', exercises: [
+        { id: 'C-mp1', name: 'World\'s Greatest Stretch w/ T-Spine Reach', equip: 'Mat',
+          reps: ['2×5 ea','2×6 ea','3×6 ea','3×8 ea'],
+          cue: 'Deep lunge, back knee hovering. Same-side hand inside the front foot. Reach the OTHER arm to the ceiling and rotate the chest open — eyes follow the hand. Lower, switch reach, step back, switch sides. Prime mover for hinge patterns — opens the hip flexors and unlocks T-spine before swings and RDLs.', noLog: true },
+        { id: 'C-mp2', name: 'Hip Airplane', equip: 'Bodyweight (wall optional)',
+          reps: ['2×5 ea','2×6 ea','3×6 ea','3×8 ea'],
+          cue: 'Stand on one leg, soft knee bend. Hinge forward into a single-leg RDL position — body in a T shape. From there, slowly rotate the pelvis open (free leg drifts toward the wall behind you) then closed. That\'s one rep. Touch the wall for balance if needed. This is your single-leg RDL insurance policy — trains hip control and rotation under tension.', noLog: true },
       ]},
       { title: 'POWER + LOWER', exercises: [
         { id: 'C-p1', name: 'KB Swing', equip: 'KB 32lb',
@@ -160,9 +184,9 @@ const DEFAULT_DAYS = {
           cue: 'Mount ANCORE high on the rack with the straight bar attachment (wider grip = more lats, less biceps). Kneel facing the unit. Pull the bar down to your upper chest — elbows drive down and out, lat focus. Slow release. Don\'t shrug at the top of the return.' },
       ]},
       { title: 'CORE', exercises: [
-        { id: 'C-c2', name: 'Med Ball Russian Twist', equip: 'TRX Slam Ball',
-          reps: ['2×10 ea','2×12 ea','3×12 ea','3×15 ea'],
-          cue: 'Seated, lean back ~45°, feet hovering if you can hold it. Hold ball at chest. Rotate side to side and tap the floor next to your hip. Move from your core, not your arms. Counts are per side.' },
+        { id: 'C-c6', name: 'Half-Kneeling ANCORE Chop', equip: 'ANCORE + single handle',
+          reps: ['2×8 ea @ 15–20 lbs','3×10 ea @ 20–25 lbs','3×10 ea @ 25–30 lbs','3×12 ea @ 30–35 lbs'],
+          cue: 'Mount ANCORE high on the rack. Kneel perpendicular to the unit — outside knee down, inside knee up (90°). Grab handle with both hands at the high shoulder. Pull the handle DOWN and ACROSS the body to the outside hip in a chopping arc — arms stay relatively straight, the rotation drives from the obliques, not the arms. Core braced hard the whole time — the cable wants to pull you back toward the rack. Slow controlled return. This is anti-rotation expressed as rotation — Cressey signature. Counts are per side.' },
         { id: 'C-c4', name: 'Pallof Press', equip: 'ANCORE + single handle',
           reps: ['2×10 ea @ 15–20 lbs','3×12 ea @ 20–25 lbs','3×12 ea @ 25–30 lbs','3×15 ea @ 30–35 lbs'],
           cue: 'Mount ANCORE at chest height. Stand perpendicular to the rack with the handle pressed into your chest with both hands. Brace core hard. Press the handle straight out in front of you — the cable will try to rotate you toward the rack. RESIST. Hold 2–3 sec at full extension. Slow return. Anti-rotation core — Cressey signature. Counts are per side.' },
@@ -210,6 +234,9 @@ const DEFAULT_DAYS = {
         { id: 'M-h3', name: 'Pigeon Pose', equip: 'Mat',
           reps: ['30 sec ea','45 sec ea','60 sec ea','60 sec ea'],
           cue: 'Front shin angled across the mat, back leg long behind you. Stack hips square. Fold forward only as far as the hip allows — never force it. Breathe into the glute.' },
+        { id: 'M-h4', name: 'Couch Stretch', equip: 'Mat + wall/couch',
+          reps: ['30 sec ea','45 sec ea','60 sec ea','60 sec ea'],
+          cue: 'Half-kneeling facing away from a wall (or couch). Slide the back shin up the wall so the foot is pointing up, knee on the mat or a pad. Front foot planted flat. Tuck the pelvis under and squeeze the back glute — you should feel a deep stretch through the front of the back hip and quad. Don\'t arch the low back. The desk-warrior antidote.' },
       ]},
       { title: 'T-SPINE & SHOULDERS', duration: '5 min', exercises: [
         { id: 'M-t1', name: 'Thread the Needle', equip: 'Mat',
@@ -221,11 +248,17 @@ const DEFAULT_DAYS = {
         { id: 'M-t3', name: 'Wall Slides', equip: 'Wall',
           reps: ['2×8','2×10','3×10','3×12'],
           cue: 'Back, head, and arms against wall. Slide arms overhead keeping contact. If wrists come off, that\'s your end range — don\'t force it. Slow.' },
+        { id: 'M-t4', name: 'Bretzel', equip: 'Mat',
+          reps: ['30 sec ea','45 sec ea','60 sec ea','60 sec ea'],
+          cue: 'Side-lying, bottom leg straight, top knee bent and pulled toward chest — held by the bottom hand. Reach the top arm behind you and grab the bottom foot if you can (a strap works too). Now rotate the top shoulder toward the floor behind you, looking over the top shoulder. Three stretches in one position: hip flexor, glute, T-spine. Cressey staple. Breathe and let things open — no forcing.' },
       ]},
-      { title: 'LOWER LEG', duration: '2 min', exercises: [
+      { title: 'LOWER LEG', duration: '3 min', exercises: [
         { id: 'M-l1', name: 'Banded Ankle Dorsiflexion', equip: 'Light Band',
           reps: ['2×8 ea','2×10 ea','3×10 ea','3×12 ea'],
           cue: 'Loop band around forefoot, anchor behind you. Sit with leg extended. Pull foot toward shin against band resistance. Trains active dorsiflexion, not just passive stretch.' },
+        { id: 'M-l2', name: 'Calf Stretch — Straight & Bent Knee', equip: 'Wall',
+          reps: ['20 sec ea position','30 sec ea position','30 sec ea position','45 sec ea position'],
+          cue: 'Hands on wall, one foot back with heel down. STRAIGHT back knee for 20–45 sec → hits the gastrocnemius. Then BEND the back knee, heel still down, hold same time → hits the soleus underneath. Two muscles, one stretch. Switch sides. Critical for any hinging, squatting, or walking pattern.' },
       ]},
       { title: 'GLUTE ACTIVATION', duration: '3 min', exercises: [
         { id: 'M-a1', name: 'Clamshells', equip: 'Light Band',
@@ -254,6 +287,7 @@ const PROGRESS_GROUPS = [
     { id: 'prog-rdl', name: 'KB RDL', goal: '3×12 + vest', metric: 'reps @ 32lb' },
     { id: 'prog-bss', name: 'Bulgarian Split Squat', goal: '3×12 ea + vest', metric: 'reps ea' },
     { id: 'prog-sl-rdl', name: 'Single Leg KB RDL', goal: '3×12 ea + vest', metric: 'reps ea' },
+    { id: 'prog-lat-lunge', name: 'Lateral Lunge', goal: '3×10 ea @ KB + light vest', metric: 'reps ea' },
     { id: 'prog-sumo', name: 'KB Sumo Deadlift', goal: '3×12 + vest', metric: 'reps' },
     { id: 'prog-swing', name: 'KB Swing', goal: '3×15 + vest', metric: 'reps' },
   ]},
@@ -265,14 +299,12 @@ const PROGRESS_GROUPS = [
     { id: 'prog-face-pull', name: 'Face Pull', goal: '3×20 @ 25–30 lbs', metric: 'reps @ lbs' },
     { id: 'prog-sa-pulldown', name: 'Straight Arm Pull-Down', goal: '3×15 @ 25–30 lbs', metric: 'reps @ lbs' },
   ]},
-  { title: 'HIP & GLUTE ISOLATION', items: [
-    { id: 'prog-hip-abd', name: 'Cable Hip Abduction', goal: '3×15 ea @ 20–25 lbs', metric: 'reps @ lbs' },
-  ]},
   { title: 'CORE', items: [
     { id: 'prog-plank', name: 'Plank Hold', goal: '3×40 sec', metric: 'seconds' },
     { id: 'prog-sideplank', name: 'Side Plank', goal: '3×30 sec ea', metric: 'seconds each' },
     { id: 'prog-situp', name: 'Straight Leg Sit-Up', goal: '3×12', metric: 'reps' },
     { id: 'prog-pallof', name: 'Pallof Press', goal: '3×15 ea @ 30–35 lbs', metric: 'reps @ lbs' },
+    { id: 'prog-chop', name: 'Half-Kneeling ANCORE Chop', goal: '3×12 ea @ 30–35 lbs', metric: 'reps @ lbs' },
     { id: 'prog-suitcase', name: 'Suitcase Carry', goal: '3×40 sec ea side', metric: 'seconds each' },
   ]},
   { title: 'POWER + CONDITIONING', items: [
@@ -638,6 +670,172 @@ let DAYS = STORAGE.loadProgram() || JSON.parse(JSON.stringify(DEFAULT_DAYS));
 
   if (changed) STORAGE.saveProgram(DAYS);
   localStorage.setItem('migration:functional-staples', '1');
+})();
+
+// Migration v4: Mobility-first overhaul.
+// 1) Remove "Cable Hip Abduction" (A-l6) and "Med Ball Russian Twist" (C-c2) — non-functional.
+// 2) Add Lateral Lunge (A-l10) to Day A LOWER BODY.
+// 3) Add Half-Kneeling ANCORE Chop (C-c6) to Day C CORE.
+// 4) Insert "MOBILITY PREP" section into Days A, B, C between WARM-UP and the first work section.
+// 5) Extend Day M with Couch Stretch, Bretzel, Calf Stretch.
+// Idempotent — checks by ID and section title before mutating.
+(function migrateMobilityFirst() {
+  if (localStorage.getItem('migration:mobility-first-v1')) return;
+
+  const findExWithSection = (exId) => {
+    for (const dayKey of Object.keys(DAYS)) {
+      for (const section of (DAYS[dayKey].sections || [])) {
+        const idx = section.exercises.findIndex(e => e.id === exId);
+        if (idx !== -1) return { dayKey, section, idx };
+      }
+    }
+    return null;
+  };
+  const findSection = (dayKey, sectionTitle) => {
+    const d = DAYS[dayKey];
+    if (!d) return null;
+    return (d.sections || []).find(s => s.title === sectionTitle) || null;
+  };
+  const hasSection = (dayKey, sectionTitle) => !!findSection(dayKey, sectionTitle);
+
+  let changed = false;
+
+  // 1) Remove deprecated exercises by ID — preserves log history (it lives under exId keys in STORAGE),
+  //    just hides the card from the active workout.
+  const toRemove = ['A-l6', 'C-c2'];
+  for (const exId of toRemove) {
+    const f = findExWithSection(exId);
+    if (f) {
+      f.section.exercises.splice(f.idx, 1);
+      changed = true;
+    }
+  }
+
+  // 2) Update durations on the strength days to reflect added prep section
+  if (DAYS.A && (DAYS.A.duration === '~30 min' || DAYS.A.duration === '30 min')) {
+    DAYS.A.duration = '~35 min'; changed = true;
+  }
+  if (DAYS.A && !/Mat/i.test(DAYS.A.equipment || '')) {
+    DAYS.A.equipment = (DAYS.A.equipment || '') + ' · Mat'; changed = true;
+  }
+  if (DAYS.B && (DAYS.B.duration === '~30 min' || DAYS.B.duration === '30 min')) {
+    DAYS.B.duration = '~33 min'; changed = true;
+  }
+  if (DAYS.B && !/Mat|Wall/i.test(DAYS.B.equipment || '')) {
+    DAYS.B.equipment = (DAYS.B.equipment || '') + ' · Mat / Wall'; changed = true;
+  }
+  if (DAYS.C && (DAYS.C.duration === '~35 min' || DAYS.C.duration === '35 min')) {
+    DAYS.C.duration = '~38 min'; changed = true;
+  }
+  if (DAYS.C && !/Mat/i.test(DAYS.C.equipment || '')) {
+    DAYS.C.equipment = (DAYS.C.equipment || '') + ' · Mat'; changed = true;
+  }
+
+  // 3) Insert MOBILITY PREP sections (skip if already present)
+  const insertMobilityPrep = (dayKey, prepSection) => {
+    const d = DAYS[dayKey];
+    if (!d || !d.sections) return;
+    if (d.sections.some(s => s.title === 'MOBILITY PREP')) return;
+    // Find WARM-UP index, insert after
+    const warmIdx = d.sections.findIndex(s => s.title === 'WARM-UP');
+    const insertAt = warmIdx === -1 ? 0 : warmIdx + 1;
+    d.sections.splice(insertAt, 0, prepSection);
+    changed = true;
+  };
+
+  insertMobilityPrep('A', { title: 'MOBILITY PREP', duration: '3 min', exercises: [
+    { id: 'A-mp1', name: 'World\'s Greatest Stretch', equip: 'Mat',
+      reps: ['2×5 ea','2×6 ea','3×6 ea','3×8 ea'],
+      cue: 'Step into a deep lunge, back knee hovering. Drop the same-side hand to the floor inside the front foot. Reach the other arm up and rotate the chest open toward the ceiling. Lower hand, switch reach, then step back to push-up position and switch sides. Hits hip flexors, hamstrings, T-spine in one shot — primes everything below.', noLog: true },
+    { id: 'A-mp2', name: '90/90 Hip Roll', equip: 'Mat',
+      reps: ['2×6 ea','2×8 ea','3×8 ea','3×10 ea'],
+      cue: 'Seated, one leg in front at 90°, other to the side at 90°. Sit tall — hands off the floor. Drive the back knee down to the floor and rotate the hips to switch sides. Slow and controlled. Wakes up hip internal and external rotation before squatting.', noLog: true },
+  ]});
+
+  insertMobilityPrep('B', { title: 'MOBILITY PREP', duration: '3 min', exercises: [
+    { id: 'B-mp1', name: 'Wall Slides', equip: 'Wall',
+      reps: ['2×8','2×10','3×10','3×12'],
+      cue: 'Back, head, and arms against wall. Slide arms overhead keeping wrists and elbows in contact with the wall. If wrists come off, that\'s your end range — don\'t force it. Trains scap upward rotation and overhead position before any pulling or pressing.', noLog: true },
+    { id: 'B-mp2', name: 'Open Book', equip: 'Mat',
+      reps: ['2×6 ea','2×8 ea','3×8 ea','3×10 ea'],
+      cue: 'Side-lying, knees stacked and bent 90° (top knee anchored), arms extended in front. Rotate the top arm open across your body, eyes follow the hand. Keep the knees pinned together — rotation comes from the spine, not the hips. Critical T-spine prep for rowing and pressing.', noLog: true },
+  ]});
+
+  insertMobilityPrep('C', { title: 'MOBILITY PREP', duration: '3 min', exercises: [
+    { id: 'C-mp1', name: 'World\'s Greatest Stretch w/ T-Spine Reach', equip: 'Mat',
+      reps: ['2×5 ea','2×6 ea','3×6 ea','3×8 ea'],
+      cue: 'Deep lunge, back knee hovering. Same-side hand inside the front foot. Reach the OTHER arm to the ceiling and rotate the chest open — eyes follow the hand. Lower, switch reach, step back, switch sides. Prime mover for hinge patterns — opens the hip flexors and unlocks T-spine before swings and RDLs.', noLog: true },
+    { id: 'C-mp2', name: 'Hip Airplane', equip: 'Bodyweight (wall optional)',
+      reps: ['2×5 ea','2×6 ea','3×6 ea','3×8 ea'],
+      cue: 'Stand on one leg, soft knee bend. Hinge forward into a single-leg RDL position — body in a T shape. From there, slowly rotate the pelvis open (free leg drifts toward the wall behind you) then closed. That\'s one rep. Touch the wall for balance if needed. This is your single-leg RDL insurance policy — trains hip control and rotation under tension.', noLog: true },
+  ]});
+
+  // 4) Add new strength-day exercises (Lateral Lunge, Half-Kneeling Chop)
+  const newStrengthExercises = [
+    { dayKey: 'A', sectionTitle: 'LOWER BODY', ex: {
+      id: 'A-l10', name: 'Lateral Lunge', equip: 'KB 32lb',
+      reps: ['2×6 ea bodyweight','3×8 ea bodyweight','3×8 ea @ KB 32lb','3×10 ea @ KB + light vest'],
+      cue: 'Hold KB at chest (goblet). Stand tall, feet together. Step wide to one side and sit back into that hip — load the working leg, keep the opposite leg straight with toes pointing forward. Chest tall, weight in mid-foot/heel of working leg. Drive through the working heel to return to center. Trains the frontal plane and adductors that bands and machines miss. Boyle-style functional glute med work.'
+    }},
+    { dayKey: 'C', sectionTitle: 'CORE', ex: {
+      id: 'C-c6', name: 'Half-Kneeling ANCORE Chop', equip: 'ANCORE + single handle',
+      reps: ['2×8 ea @ 15–20 lbs','3×10 ea @ 20–25 lbs','3×10 ea @ 25–30 lbs','3×12 ea @ 30–35 lbs'],
+      cue: 'Mount ANCORE high on the rack. Kneel perpendicular to the unit — outside knee down, inside knee up (90°). Grab handle with both hands at the high shoulder. Pull the handle DOWN and ACROSS the body to the outside hip in a chopping arc — arms stay relatively straight, the rotation drives from the obliques, not the arms. Core braced hard the whole time — the cable wants to pull you back toward the rack. Slow controlled return. This is anti-rotation expressed as rotation — Cressey signature. Counts are per side.'
+    }},
+  ];
+  for (const item of newStrengthExercises) {
+    if (findExWithSection(item.ex.id)) continue;
+    const section = findSection(item.dayKey, item.sectionTitle);
+    if (!section) continue;
+    // Chop should land before Side Plank/Suitcase Carry — insert at start of CORE if it's the chop
+    if (item.ex.id === 'C-c6') {
+      section.exercises.unshift(item.ex);
+    } else {
+      section.exercises.push(item.ex);
+    }
+    changed = true;
+  }
+
+  // 5) Extend Day M
+  const dayMAdds = [
+    { sectionTitle: 'HIPS', after: 'M-h3', ex: {
+      id: 'M-h4', name: 'Couch Stretch', equip: 'Mat + wall/couch',
+      reps: ['30 sec ea','45 sec ea','60 sec ea','60 sec ea'],
+      cue: 'Half-kneeling facing away from a wall (or couch). Slide the back shin up the wall so the foot is pointing up, knee on the mat or a pad. Front foot planted flat. Tuck the pelvis under and squeeze the back glute — you should feel a deep stretch through the front of the back hip and quad. Don\'t arch the low back. The desk-warrior antidote.'
+    }},
+    { sectionTitle: 'T-SPINE & SHOULDERS', after: 'M-t3', ex: {
+      id: 'M-t4', name: 'Bretzel', equip: 'Mat',
+      reps: ['30 sec ea','45 sec ea','60 sec ea','60 sec ea'],
+      cue: 'Side-lying, bottom leg straight, top knee bent and pulled toward chest — held by the bottom hand. Reach the top arm behind you and grab the bottom foot if you can (a strap works too). Now rotate the top shoulder toward the floor behind you, looking over the top shoulder. Three stretches in one position: hip flexor, glute, T-spine. Cressey staple. Breathe and let things open — no forcing.'
+    }},
+    { sectionTitle: 'LOWER LEG', after: 'M-l1', ex: {
+      id: 'M-l2', name: 'Calf Stretch — Straight & Bent Knee', equip: 'Wall',
+      reps: ['20 sec ea position','30 sec ea position','30 sec ea position','45 sec ea position'],
+      cue: 'Hands on wall, one foot back with heel down. STRAIGHT back knee for 20–45 sec → hits the gastrocnemius. Then BEND the back knee, heel still down, hold same time → hits the soleus underneath. Two muscles, one stretch. Switch sides. Critical for any hinging, squatting, or walking pattern.'
+    }},
+  ];
+  for (const add of dayMAdds) {
+    if (findExWithSection(add.ex.id)) continue;
+    const section = findSection('M', add.sectionTitle);
+    if (!section) continue;
+    const afterIdx = section.exercises.findIndex(e => e.id === add.after);
+    if (afterIdx === -1) {
+      section.exercises.push(add.ex);
+    } else {
+      section.exercises.splice(afterIdx + 1, 0, add.ex);
+    }
+    changed = true;
+  }
+
+  // Bump LOWER LEG duration since we added a stretch
+  const lowerLeg = findSection('M', 'LOWER LEG');
+  if (lowerLeg && lowerLeg.duration === '2 min') {
+    lowerLeg.duration = '3 min';
+    changed = true;
+  }
+
+  if (changed) STORAGE.saveProgram(DAYS);
+  localStorage.setItem('migration:mobility-first-v1', '1');
 })();
 
 function saveProgramAndRerender() {
