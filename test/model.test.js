@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import {
   blankState,
   checkinPoints,
+  chicagoNow,
   currentStreak,
   earliestWeek,
   emptyExerciseLog,
@@ -14,12 +15,43 @@ import {
   sameContent,
   sanitizeState,
   sessionExercises,
+  shiftWeek,
+  shiftWithinBounds,
   suggestSlot,
+  weekBounds,
   weekKey,
   weekStatus,
 } from '../lib/model.js';
 
 const TODAY = new Date(2026, 10, 1, 15, 0, 0); // Sunday Nov 1, 2026
+
+test('Chicago Sunday evening stays Sunday, not Monday UTC', () => {
+  // 2026-11-02 03:00 UTC is Sunday Nov 1, 9:00pm in Chicago (CST, UTC-6).
+  const evening = chicagoNow(new Date('2026-11-02T03:00:00.000Z'));
+  assert.equal(evening.iso, '2026-11-01');
+  assert.equal(evening.hour, 21);
+  assert.equal(suggestSlot(evening.date), 'H');
+  assert.equal(weekKey(evening.date), '2026-10-26');
+
+  // Two hours later it is Monday morning in Chicago.
+  const monday = chicagoNow(new Date('2026-11-02T06:30:00.000Z'));
+  assert.equal(monday.iso, '2026-11-02');
+  assert.equal(suggestSlot(monday.date), 'M');
+  assert.equal(weekKey(monday.date), '2026-11-02');
+});
+
+test('weeks can move past this week and back, including empty weeks', () => {
+  const state = blankState();
+  const today = new Date(2026, 10, 1, 12);
+  const bounds = weekBounds(state, today);
+  assert.equal(bounds.current, '2026-10-26');
+  assert.equal(bounds.latest, shiftWeek('2026-10-26', 8));
+  assert.equal(bounds.earliest, shiftWeek('2026-10-26', -16));
+  assert.equal(shiftWithinBounds('2026-10-26', 1, bounds), '2026-11-02');
+  assert.equal(shiftWithinBounds('2026-10-26', -1, bounds), '2026-10-19');
+  assert.equal(shiftWithinBounds(bounds.latest, 1, bounds), bounds.latest);
+  assert.equal(shiftWithinBounds(bounds.earliest, -1, bounds), bounds.earliest);
+});
 
 test('weeks start Monday and Sunday suggests the hike', () => {
   assert.equal(weekKey(TODAY), '2026-10-26');
@@ -86,6 +118,22 @@ test('merge keeps both phones and lets the newer program win', () => {
   assert.equal(merged.checkins['2026-10-26'].energy, 4);
   assert.equal(merged.program.days.A.sections[0].exercises[0].dose, '4 × 6');
   assert.equal(sameContent(merged, remote), false);
+});
+
+test('a custom exercise survives when the other phone has a newer program', () => {
+  const local = blankState('2026-11-01T00:00:00.000Z');
+  local.program.updatedAt = '2026-11-01T01:00:00.000Z';
+  local.program.days.A.sections.push({
+    title: 'Yours',
+    exercises: [{ id: 'custom-9', name: 'Step-up', equip: 'Box', dose: '3×10', sets: 3, log: 'load', cue: '' }],
+  });
+  const remote = blankState('2026-11-01T00:00:00.000Z');
+  remote.program.updatedAt = '2026-11-01T05:00:00.000Z';
+  remote.program.days.A.sections[0].exercises[0].dose = '4 × 6';
+  const merged = mergeState(local, remote);
+  assert.equal(merged.program.days.A.sections[0].exercises[0].dose, '4 × 6');
+  const yours = merged.program.days.A.sections.find((section) => section.title === 'Yours');
+  assert.equal(yours.exercises[0].name, 'Step-up');
 });
 
 test('newer log for the same session wins', () => {

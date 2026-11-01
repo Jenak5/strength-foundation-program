@@ -3,10 +3,10 @@ import {
   SLOTS,
   blankState,
   checkinPoints,
+  chicagoNow,
   clampScore,
   currentStreak,
   defaultProgram,
-  earliestWeek,
   emptyExerciseLog,
   encouragement,
   esc,
@@ -28,8 +28,9 @@ import {
   sanitizeState,
   sessionDoneCount,
   sessionExercises,
-  shiftWeek,
+  shiftWithinBounds,
   suggestSlot,
+  weekBounds,
   weekKey,
   weekStatus,
   isoDate,
@@ -42,7 +43,7 @@ const MIGRATED_FLAG = 'sfp-migrated-local-v1';
 const WORDS = ['', 'Rough', 'Low', 'Okay', 'Good', 'Strong'];
 const SETUP = 'Cloud sync uses a private Vercel Blob store. In the Vercel project, Storage → Create → Blob, name it jena-training-log, access Private, connect it to strength-foundation-program, then redeploy. Upstash Redis (UPSTASH_REDIS_REST_URL and UPSTASH_REDIS_REST_TOKEN) works in place of Blob.';
 
-const today = () => new Date();
+const today = () => chicagoNow().date;
 const UI = {
   view: 'today',
   week: weekKey(today()),
@@ -93,8 +94,8 @@ function isAppTyping() {
   return !!el && !!app?.contains(el) && (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA');
 }
 
-function hello(date) {
-  const hour = date.getHours();
+function hello() {
+  const hour = chicagoNow().hour;
   if (hour < 12) return 'Good morning';
   if (hour < 17) return 'Good afternoon';
   return 'Good evening';
@@ -279,18 +280,27 @@ function render() {
 }
 
 function weekSwitcher() {
-  const current = currentWeek();
-  const earliest = earliestWeek(state, today());
-  const here = UI.week === current;
+  const bounds = weekBounds(state, today());
+  const here = UI.week === bounds.current;
   return `
     <div class="weekline">
-      <button class="arrow" type="button" data-action="week" data-delta="-1" ${UI.week <= earliest ? 'disabled' : ''} aria-label="Previous week">‹</button>
+      <button class="arrow" type="button" data-action="week" data-delta="-1" ${UI.week <= bounds.earliest ? 'disabled' : ''} aria-label="Previous week">‹</button>
       <div>
         <strong>${esc(formatWeekRange(UI.week))}</strong>
-        ${here ? '<div class="now">This week</div>' : '<button class="text-btn" type="button" data-action="this-week">Jump to this week</button>'}
+        ${here ? '<div class="now">This week</div>' : '<button class="text-btn" type="button" data-action="this-week">Today</button>'}
       </div>
-      <button class="arrow" type="button" data-action="week" data-delta="1" ${UI.week >= current ? 'disabled' : ''} aria-label="Next week">›</button>
+      <button class="arrow" type="button" data-action="week" data-delta="1" ${UI.week >= bounds.latest ? 'disabled' : ''} aria-label="Next week">›</button>
     </div>`;
+}
+
+function goToday() {
+  const date = today();
+  UI.week = weekKey(date);
+  UI.slot = suggestSlot(date);
+  UI.mobilityDate = isoDate(date);
+  UI.view = 'today';
+  UI.adding = false;
+  UI.editing = null;
 }
 
 function slotSwitcher(status) {
@@ -315,7 +325,7 @@ function renderToday() {
         </div>
         <button class="sync" type="button" data-sync data-action="sync">${esc(syncLabel())}</button>
       </div>
-      <p class="encourage">${esc(hello(date))}. ${esc(encouragement(date, status, UI.slot))}</p>
+      <p class="encourage">${esc(hello())}. ${esc(encouragement(date, status, UI.slot))}</p>
       ${weekSwitcher()}
       ${slotSwitcher(status)}
       <p class="pieces">${esc(pieceLine)}</p>
@@ -810,27 +820,31 @@ function onInput(event) {
 function onClick(event) {
   const button = event.target.closest('[data-action], [data-nav]');
   if (!button) return;
+  const active = document.activeElement;
+  if (active && active !== button && (active.tagName === 'INPUT' || active.tagName === 'TEXTAREA')) active.blur();
   const action = button.dataset.action || (button.dataset.nav ? 'nav' : '');
   if (action === 'nav') {
-    UI.view = button.dataset.nav;
     UI.adding = false;
     UI.editing = null;
+    if (button.dataset.nav === 'today') goToday();
+    else UI.view = button.dataset.nav;
     render();
     window.scrollTo(0, 0);
     return;
   }
   if (action === 'week') {
-    const next = shiftWeek(UI.week, Number(button.dataset.delta));
-    if (button.dataset.delta === '1' && next > currentWeek()) return;
-    if (button.dataset.delta === '-1' && UI.week <= earliestWeek(state, today())) return;
+    if (button.disabled) return;
+    const bounds = weekBounds(state, today());
+    const next = shiftWithinBounds(UI.week, Number(button.dataset.delta), bounds);
+    if (next === UI.week) return;
     UI.week = next;
+    const days = Array.from({ length: 7 }, (_, i) => isoDate(addDays(parseISO(UI.week), i)));
+    if (!days.includes(UI.mobilityDate)) UI.mobilityDate = days[0];
     render();
     return;
   }
   if (action === 'this-week') {
-    UI.week = currentWeek();
-    UI.slot = suggestSlot(today());
-    UI.mobilityDate = isoDate(today());
+    goToday();
     render();
     return;
   }
@@ -988,6 +1002,19 @@ function init() {
     if (document.visibilityState === 'visible') pull();
   }, 30000);
   if ('serviceWorker' in navigator) {
+    let hadController = !!navigator.serviceWorker.controller;
+    navigator.serviceWorker.addEventListener('controllerchange', () => {
+      // The first install should not reload. A later update should, so a
+      // home-screen app picks up the new week navigation without a reinstall.
+      if (!hadController) {
+        hadController = true;
+        return;
+      }
+      window.location.reload();
+    });
+    navigator.serviceWorker.addEventListener('message', (event) => {
+      if (event.data && event.data.type === 'sw-updated' && hadController) window.location.reload();
+    });
     navigator.serviceWorker.register('/sw.js', { updateViaCache: 'none' }).catch(() => {});
   }
   render();
