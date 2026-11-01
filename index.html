@@ -133,11 +133,6 @@
   .session-old p { color: var(--soft); font-size: 15px; }
   .actions { display: flex; flex-direction: column; gap: 8px; margin-top: 8px; }
   .fine { color: var(--faint); font-size: 13px; }
-  #sheet { position: fixed; inset: 0; z-index: 20; display: none; background: rgba(28, 25, 21, 0.35); padding: 18px; }
-  #sheet.open { display: grid; align-items: end; }
-  .sheet { background: var(--surface); border-radius: 24px; padding: 22px 18px calc(18px + env(safe-area-inset-bottom, 0)); width: min(560px, 100%); margin: 0 auto; box-shadow: var(--shadow); }
-  .sheet p { color: var(--soft); margin: 8px 0 14px; }
-  .err { color: var(--danger); font-weight: 700; min-height: 1.2em; }
   .nav { position: fixed; left: 0; right: 0; bottom: 0; z-index: 10; display: flex; background: rgba(255, 253, 248, 0.94); backdrop-filter: blur(16px); border-top: 1px solid var(--line); padding-bottom: env(safe-area-inset-bottom, 0); }
   .nav button { flex: 1; min-height: 64px; color: var(--faint); font-size: 13px; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; }
   .nav button.on { color: var(--pine); }
@@ -153,7 +148,6 @@
 </head>
 <body>
 <div id="app"></div>
-<div id="sheet"></div>
 <nav class="nav" id="nav">
   <button type="button" data-nav="today">
     <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 12h16M7 7v10M17 7v10"/></svg>
@@ -168,6 +162,9 @@
     Progress
   </button>
 </nav>
-<script type="module" src="/app.js"></script>
+<script>
+try { localStorage.removeItem('sfp-passcode'); } catch (e) {}
+</script>
+<script type="module" src="/app.js?v=3"></script>
 </body>
 </html>

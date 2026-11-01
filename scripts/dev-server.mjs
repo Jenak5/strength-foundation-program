@@ -5,7 +5,6 @@ import { extname, join, normalize } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const root = fileURLToPath(new URL('..', import.meta.url));
-process.env.APP_PASSCODE ||= 'dev-pass';
 process.env.LOCAL_JSON_STORE ||= join(root, '.data', 'store.json');
 
 const { default: handler } = await import('../api/state.js');
@@ -54,5 +53,4 @@ const server = createServer(async (req, res) => {
 const port = Number(process.env.PORT || 4173);
 server.listen(port, () => {
   console.log(`http://localhost:${port}`);
-  console.log(`passcode: ${process.env.APP_PASSCODE}`);
 });

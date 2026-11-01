@@ -38,10 +38,9 @@ import {
 } from '/lib/model.js';
 
 const LOCAL_KEY = 'sfp-state-v2';
-const PASS_KEY = 'sfp-passcode';
 const MIGRATED_FLAG = 'sfp-migrated-local-v1';
 const WORDS = ['', 'Rough', 'Low', 'Okay', 'Good', 'Strong'];
-const SETUP = 'Cloud sync uses a private Vercel Blob store plus APP_PASSCODE. In the Vercel project, Storage → Create → Blob, name it jena-training-log, access Private, connect it to strength-foundation-program, set APP_PASSCODE for Production, Preview, and Development, then redeploy. Upstash Redis (UPSTASH_REDIS_REST_URL and UPSTASH_REDIS_REST_TOKEN) works in place of Blob.';
+const SETUP = 'Cloud sync uses a private Vercel Blob store. In the Vercel project, Storage → Create → Blob, name it jena-training-log, access Private, connect it to strength-foundation-program, then redeploy. Upstash Redis (UPSTASH_REDIS_REST_URL and UPSTASH_REDIS_REST_TOKEN) works in place of Blob.';
 
 const today = () => new Date();
 const UI = {
@@ -63,6 +62,7 @@ let pushing = false;
 let pushQueued = false;
 
 function boot() {
+  try { localStorage.removeItem('sfp-passcode'); } catch { /* already gone */ }
   let next = null;
   try { next = sanitizeState(JSON.parse(localStorage.getItem(LOCAL_KEY) || 'null')); } catch { next = null; }
   if (!next) next = blankState();
@@ -87,10 +87,6 @@ function saveLocal() {
   localStorage.setItem(LOCAL_KEY, JSON.stringify(state));
 }
 
-function passcode() {
-  return localStorage.getItem(PASS_KEY) || '';
-}
-
 function isAppTyping() {
   const el = document.activeElement;
   const app = document.getElementById('app');
@@ -107,7 +103,6 @@ function hello(date) {
 function syncLabel() {
   if (syncStatus === 'synced') return 'Synced';
   if (syncStatus === 'syncing') return 'Syncing';
-  if (syncStatus === 'auth') return 'Add sync';
   if (syncStatus === 'offline') return 'Saved here';
   return 'On this phone';
 }
@@ -133,17 +128,11 @@ function touch(rerender) {
 }
 
 async function pull(options = {}) {
-  if (!passcode()) {
-    syncStatus = 'local';
-    updateChip();
-    return;
-  }
   if (!options.force && isAppTyping()) return;
   syncStatus = 'syncing';
   updateChip();
   try {
-    const res = await fetch('/api/state', { headers: { 'x-passcode': passcode() } });
-    if (res.status === 401) { syncStatus = 'auth'; render(); return; }
+    const res = await fetch('/api/state');
     if (res.status === 503) { syncStatus = 'unconfigured'; render(); return; }
     if (!res.ok) { syncStatus = 'offline'; updateChip(); return; }
     const body = await res.json();
@@ -171,11 +160,6 @@ async function pull(options = {}) {
 }
 
 async function push(attempt = 0) {
-  if (!passcode()) {
-    syncStatus = 'local';
-    updateChip();
-    return;
-  }
   if (pushing) {
     pushQueued = true;
     return;
@@ -186,7 +170,7 @@ async function push(attempt = 0) {
   try {
     const res = await fetch('/api/state', {
       method: 'PUT',
-      headers: { 'content-type': 'application/json', 'x-passcode': passcode() },
+      headers: { 'content-type': 'application/json' },
       body: JSON.stringify({ baseRevision: revision, state }),
     });
     const body = await res.json().catch(() => ({}));
@@ -199,7 +183,6 @@ async function push(attempt = 0) {
       await push(attempt + 1);
       return;
     }
-    if (res.status === 401) { syncStatus = 'auth'; render(); return; }
     if (res.status === 503) { syncStatus = 'unconfigured'; render(); return; }
     if (!res.ok) { syncStatus = 'offline'; updateChip(); return; }
     revision = body.revision || revision;
@@ -330,7 +313,7 @@ function renderToday() {
           <p class="eyebrow">For Jena</p>
           <h1>${esc(meta.label)}</h1>
         </div>
-        <button class="sync" type="button" data-sync data-action="passcode">${esc(syncLabel())}</button>
+        <button class="sync" type="button" data-sync data-action="sync">${esc(syncLabel())}</button>
       </div>
       <p class="encourage">${esc(hello(date))}. ${esc(encouragement(date, status, UI.slot))}</p>
       ${weekSwitcher()}
@@ -571,7 +554,7 @@ function renderWeek() {
         <p class="eyebrow">This week’s shape</p>
         <h1>Week</h1>
       </div>
-      <button class="sync" type="button" data-sync data-action="passcode">${esc(syncLabel())}</button>
+      <button class="sync" type="button" data-sync data-action="sync">${esc(syncLabel())}</button>
     </header>
     ${weekSwitcher()}
     <p class="pieces">${streak ? `${streak} week${streak === 1 ? '' : 's'} in a row.` : 'No streak yet. It starts whenever you do.'} ${status.kept ? 'This week counts.' : 'Two pieces make it count.'}</p>
@@ -629,7 +612,7 @@ function renderProgress() {
         <p class="eyebrow">Keep going</p>
         <h1>Progress</h1>
       </div>
-      <button class="sync" type="button" data-sync data-action="passcode">${esc(syncLabel())}</button>
+      <button class="sync" type="button" data-sync data-action="sync">${esc(syncLabel())}</button>
     </header>
     <section class="hero">
       <p class="streak">${streak}</p>
@@ -734,14 +717,12 @@ function renderArchive() {
 function renderAbout() {
   const installed = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
   const syncCopy = syncStatus === 'synced'
-    ? 'Saved in your private cloud and on this phone. The passcode stays on this device.'
+    ? 'Saved in your private cloud and on this phone. It follows you without a passcode.'
     : syncStatus === 'unconfigured'
       ? SETUP
-      : syncStatus === 'auth'
-        ? 'The passcode on this phone did not match. Try it again. Logs already here stay here.'
-        : syncStatus === 'offline'
-          ? 'Saved on this phone. Sync will try again when you are online.'
-          : 'Saved on this phone. Add the passcode when you want this log on another device.';
+      : syncStatus === 'offline'
+        ? 'Saved on this phone. Sync will try again when you are online.'
+        : 'Saved on this phone. Sync starts as soon as the cloud is reachable.';
   return `
     <section class="card">
       <p class="kicker">The week</p>
@@ -754,8 +735,7 @@ function renderAbout() {
       <p class="kicker">On your phones</p>
       <p>${esc(syncCopy)}</p>
       <div class="actions">
-        <button class="primary" type="button" data-action="passcode">${passcode() ? 'Change passcode' : 'Enter passcode'}</button>
-        ${UI.installEvent && !installed ? '<button class="ghost" type="button" data-action="install">Install on this phone</button>' : ''}
+        ${UI.installEvent && !installed ? '<button class="primary" type="button" data-action="install">Install on this phone</button>' : '<button class="ghost" type="button" data-action="sync">Sync now</button>'}
       </div>
       <p class="fine" style="margin-top:10px">${installed ? 'This is already on your home screen.' : 'iPhone: Share, then Add to Home Screen. Android: browser menu, then Install app.'}</p>
     </section>
@@ -765,33 +745,6 @@ function renderAbout() {
       <button class="danger" type="button" data-action="reset">Reset exercises</button>
     </section>
   `;
-}
-
-function openSheet(message = '') {
-  const sheet = document.getElementById('sheet');
-  sheet.className = 'open';
-  sheet.innerHTML = `
-    <form class="sheet" id="pass-form">
-      <p class="eyebrow">Private log</p>
-      <h2>Sync passcode</h2>
-      <p>Enter it once on this phone. The log can then follow you. You can keep training without it.</p>
-      <label class="field">Passcode
-        <input name="passcode" type="password" inputmode="numeric" autocomplete="current-password" enterkeyhint="done">
-      </label>
-      <p class="err">${esc(message)}</p>
-      <div class="actions">
-        <button class="primary" type="submit">Save and sync</button>
-        <button class="ghost" type="button" data-action="close-sheet">Not now</button>
-      </div>
-    </form>
-  `;
-  sheet.querySelector('input').focus();
-}
-
-function closeSheet() {
-  const sheet = document.getElementById('sheet');
-  sheet.className = '';
-  sheet.innerHTML = '';
 }
 
 function dayForSlot() {
@@ -959,8 +912,7 @@ function onClick(event) {
     touch(true);
     return;
   }
-  if (action === 'passcode') { openSheet(syncStatus === 'auth' ? 'That passcode does not match.' : ''); return; }
-  if (action === 'close-sheet') { closeSheet(); return; }
+  if (action === 'sync') { pull({ force: true }); return; }
   if (action === 'install' && UI.installEvent) {
     UI.installEvent.prompt();
     UI.installEvent = null;
@@ -978,20 +930,6 @@ function onClick(event) {
 
 function onSubmit(event) {
   const form = event.target;
-  if (form.id === 'pass-form') {
-    event.preventDefault();
-    const value = form.querySelector('[name="passcode"]').value.trim();
-    if (!value) return;
-    localStorage.setItem(PASS_KEY, value);
-    form.querySelector('.err').textContent = 'Checking…';
-    pull({ force: true }).then(() => {
-      if (syncStatus === 'synced') closeSheet();
-      else if (syncStatus === 'auth') openSheet('That passcode does not match.');
-      else if (syncStatus === 'unconfigured') openSheet('Saved on this phone. Cloud sync is not turned on yet.');
-      else closeSheet();
-    });
-    return;
-  }
   if (form.dataset.addForm) {
     event.preventDefault();
     const field = (name) => form.querySelector(`[name="${name}"]`).value.trim();
@@ -1037,8 +975,6 @@ function init() {
   document.getElementById('app').addEventListener('input', onInput);
   document.getElementById('app').addEventListener('click', onClick);
   document.getElementById('nav').addEventListener('click', onClick);
-  document.getElementById('sheet').addEventListener('click', onClick);
-  document.getElementById('sheet').addEventListener('submit', onSubmit);
   document.getElementById('app').addEventListener('submit', onSubmit);
   window.addEventListener('beforeinstallprompt', (event) => {
     event.preventDefault();
@@ -1051,7 +987,9 @@ function init() {
   setInterval(() => {
     if (document.visibilityState === 'visible') pull();
   }, 30000);
-  if ('serviceWorker' in navigator) navigator.serviceWorker.register('/sw.js').catch(() => {});
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('/sw.js', { updateViaCache: 'none' }).catch(() => {});
+  }
   render();
   pull();
 }

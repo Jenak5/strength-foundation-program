@@ -16,6 +16,7 @@ test.before(async () => {
   delete process.env.KV_REST_API_URL;
   delete process.env.KV_REST_API_TOKEN;
   delete process.env.VERCEL;
+  delete process.env.APP_PASSCODE;
   process.env.LOCAL_JSON_STORE = join(dir, 'store.json');
 });
 
@@ -23,27 +24,12 @@ test.after(async () => {
   await rm(dir, { recursive: true, force: true });
 });
 
-async function api(method, { passcode = 'secret', body } = {}) {
+async function api(method, { body } = {}) {
   const { handle } = await import('../api/state.js');
-  return handle({
-    method,
-    headers: passcode == null ? {} : { 'x-passcode': passcode },
-    body,
-  });
+  return handle({ method, body });
 }
 
-test('passcode protects the log and revisions reject stale writes', async () => {
-  const previous = process.env.APP_PASSCODE;
-  delete process.env.APP_PASSCODE;
-  const missing = await api('GET', { passcode: 'secret' });
-  process.env.APP_PASSCODE = previous || 'secret';
-  assert.equal(missing.status, 503);
-  assert.match(missing.json.setup, /APP_PASSCODE/);
-
-  process.env.APP_PASSCODE = 'secret';
-  const denied = await api('GET', { passcode: 'nope' });
-  assert.equal(denied.status, 401);
-
+test('the log syncs without a passcode and rejects stale writes', async () => {
   const empty = await api('GET');
   assert.equal(empty.status, 200);
   assert.equal(empty.json.state, null);
