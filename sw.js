@@ -1,5 +1,5 @@
-const CACHE = 'training-shell-v3';
-const ASSETS = ['/', '/index.html', '/app.js', '/app.js?v=3', '/lib/model.js', '/manifest.json', '/icon.svg', '/icon-192.png', '/icon-512.png'];
+const CACHE = 'training-shell-v4';
+const ASSETS = ['/', '/index.html', '/app.js', '/app.js?v=4', '/lib/model.js', '/manifest.json', '/icon.svg', '/icon-192.png', '/icon-512.png'];
 
 self.addEventListener('install', (event) => {
   event.waitUntil(caches.open(CACHE).then((cache) => cache.addAll(ASSETS)).then(() => self.skipWaiting()));
@@ -10,6 +10,10 @@ self.addEventListener('activate', (event) => {
     const keys = await caches.keys();
     await Promise.all(keys.filter((key) => key !== CACHE).map((key) => caches.delete(key)));
     await self.clients.claim();
+    const windows = await self.clients.matchAll({ type: 'window' });
+    windows.forEach((client) => {
+      client.postMessage({ type: 'sw-updated' });
+    });
   })());
 });
 
