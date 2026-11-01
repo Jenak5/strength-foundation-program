@@ -1,0 +1,12 @@
+{
+  "name": "strength-foundation-program",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "node scripts/dev-server.mjs",
+    "test": "node --test test/model.test.js test/api.test.js"
+  },
+  "dependencies": {
+    "@vercel/blob": "^2.8.2"
+  }
+}
