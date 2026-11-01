@@ -1,44 +1,9 @@
-import { timingSafeEqual } from 'node:crypto';
 import { readRecord, setupMessage, storeKind, writeRecord } from '../lib/store.js';
 
 const MAX_BYTES = 1_500_000;
 
-function passcodeStatus(given) {
-  const expected = process.env.APP_PASSCODE || '';
-  if (!expected) return { configured: false, ok: false };
-  const provided = Buffer.from(String(given || ''));
-  const wanted = Buffer.from(expected);
-  if (provided.length !== wanted.length) {
-    timingSafeEqual(wanted, wanted);
-    return { configured: true, ok: false };
-  }
-  return { configured: true, ok: timingSafeEqual(provided, wanted) };
-}
-
-function headerPasscode(headers) {
-  const direct = headers['x-passcode'] || headers['X-Passcode'];
-  if (direct) return Array.isArray(direct) ? direct[0] : direct;
-  const auth = headers.authorization || headers.Authorization || '';
-  const match = String(auth).match(/^Bearer\s+(.+)$/i);
-  return match ? match[1] : '';
-}
-
-export async function handle({ method, headers = {}, body }) {
+export async function handle({ method, body }) {
   if (method === 'OPTIONS') return { status: 204, json: {} };
-
-  const pass = passcodeStatus(headerPasscode(headers));
-  if (!pass.configured) {
-    return {
-      status: 503,
-      json: {
-        ok: false,
-        error: 'not_configured',
-        missing: 'APP_PASSCODE',
-        setup: 'Set APP_PASSCODE on the Vercel project for Production, Preview, and Development, then redeploy. ' + setupMessage(),
-      },
-    };
-  }
-  if (!pass.ok) return { status: 401, json: { ok: false, error: 'unauthorized' } };
 
   if (storeKind() === 'none') {
     return {
